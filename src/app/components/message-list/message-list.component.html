@@ -3,7 +3,8 @@
     @for (message of messages; track message.id) {
       <div class="message-item bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 cursor-pointer"
            [class.bg-blue-50]="!message.isRead"
-           [class.border-blue-200]="!message.isRead"
+           [class.border-blue-300]="!message.isRead"
+           [class.border-2]="!message.isRead"
            [class.highlighted]="isHighlighted(message)"
            [class.bg-yellow-100]="isHighlighted(message)"
            [class.border-yellow-400]="isHighlighted(message)"
@@ -30,10 +31,11 @@
           
           <!-- Contenido del mensaje -->
           <div class="flex-1 min-w-0">
-            <p class="text-gray-900 text-sm font-medium">
-              <span class="font-semibold">{{ getSenderName(message) }}</span> {{ message.content }}
+            <p class="text-sm" [class.font-bold]="!message.isRead" [class.text-gray-900]="message.isRead" [class.text-gray-800]="!message.isRead">
+              <span [class.font-bold]="!message.isRead" [class.font-semibold]="message.isRead">{{ getSenderName(message) }}</span> 
+              <span [class.font-bold]="!message.isRead">{{ message.content }}</span>
             </p>
-            <p class="text-xs text-gray-500 mt-1">
+            <p class="text-xs mt-1" [class.text-gray-500]="message.isRead" [class.text-gray-600]="!message.isRead" [class.font-semibold]="!message.isRead">
               {{ formatTimestamp(message.timestamp) }}
             </p>
             @if (!message.isRead) {

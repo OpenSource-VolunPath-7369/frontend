@@ -56,13 +56,20 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (messages) => {
           console.log('Messages loaded:', messages);
-          this.messages = messages;
+          console.log('Messages count:', messages.length);
+          // Sort messages by timestamp (newest first)
+          this.messages = messages.sort((a, b) => {
+            const dateA = new Date(a.timestamp).getTime();
+            const dateB = new Date(b.timestamp).getTime();
+            return dateB - dateA;
+          });
           this.loading = false;
         },
         error: (error) => {
           this.error = 'Error al cargar los mensajes';
           this.loading = false;
           console.error('Error loading messages:', error);
+          console.error('Error details:', JSON.stringify(error, null, 2));
         }
       });
 
@@ -80,6 +87,13 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           console.log('Message marked as read:', messageId);
+          // Update local message state
+          const message = this.messages.find(m => m.id === messageId);
+          if (message) {
+            message.markAsRead();
+          }
+          // Reload messages to ensure sync
+          this.loadMessages();
         },
         error: (error) => {
           console.error('Error marking message as read:', error);

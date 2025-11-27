@@ -54,6 +54,10 @@ export class MessageService {
     const senderIcon = data.senderIcon || user?.avatar || '/assets/mundo.png';
     const senderName = data.senderName || user?.name || 'Usuario desconocido';
 
+    // Handle isRead field - backend may return isRead or is_read
+    const isRead = data.isRead !== undefined ? data.isRead : 
+                   (data.is_read !== undefined ? data.is_read : false);
+
     const message = new Message(
       String(data.id),
       String(data.senderId),
@@ -62,7 +66,7 @@ export class MessageService {
       String(data.recipientId),
       data.content,
       data.createdAt || data.timestamp || new Date().toISOString(),
-      data.isRead || false,
+      isRead,
       this.mapBackendMessageTypeToFrontend(data.type),
       data.senderOrganization // Incluir el nombre de la organización si existe
     );
