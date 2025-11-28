@@ -352,12 +352,29 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
           })));
           
           // Mostrar mensajes recibidos Y enviados por el usuario actual
-          // Para recibidos, buscar por cualquiera de los IDs (userId o organizationId)
-          // Para enviados, buscar solo por userId
+          // El backend ya devuelve mensajes donde el usuario es sender o recipient
+          // Pero verificamos también por los recipientIds por si hay mensajes con diferentes IDs
           this.messages = allMessages.filter(msg => {
             const msgRecipientId = String(msg.recipientId);
             const msgSenderId = String(msg.senderId);
-            return normalizedRecipientIds.includes(msgRecipientId) || msgSenderId === normalizedUserId;
+            // Incluir si el mensaje es para el usuario (recipient) o del usuario (sender)
+            const isRecipient = normalizedRecipientIds.includes(msgRecipientId);
+            const isSender = msgSenderId === normalizedUserId;
+            
+            // Log para debugging
+            if (!isRecipient && !isSender) {
+              console.log('⚠️ Mensaje excluido:', {
+                id: msg.id,
+                senderId: msgSenderId,
+                recipientId: msgRecipientId,
+                normalizedUserId: normalizedUserId,
+                normalizedRecipientIds: normalizedRecipientIds,
+                isRecipient: isRecipient,
+                isSender: isSender
+              });
+            }
+            
+            return isRecipient || isSender;
           });
           
           // Debug: mostrar todos los mensajes y sus recipientIds
@@ -371,14 +388,24 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
             content: m.content.substring(0, 30)
           })));
           console.log('IDs que estamos buscando:', recipientIds);
-          console.log('Mensajes que coinciden con recipientIds:', allMessages.filter(msg => recipientIds.includes(msg.recipientId)).map(m => ({
+          // Verificar coincidencias con recipientIds (comparando como strings)
+          const matchingRecipient = allMessages.filter(msg => {
+            const msgRecipientId = String(msg.recipientId);
+            return normalizedRecipientIds.includes(msgRecipientId);
+          });
+          console.log('Mensajes que coinciden con recipientIds:', matchingRecipient.length, matchingRecipient.map(m => ({
             id: m.id,
             recipientId: m.recipientId,
+            recipientIdString: String(m.recipientId),
             senderName: m.senderName
           })));
-          console.log('Mensajes que coinciden con senderId:', allMessages.filter(msg => msg.senderId === userId).map(m => ({
+          
+          // Verificar coincidencias con senderId
+          const matchingSender = allMessages.filter(msg => String(msg.senderId) === normalizedUserId);
+          console.log('Mensajes que coinciden con senderId:', matchingSender.length, matchingSender.map(m => ({
             id: m.id,
             senderId: m.senderId,
+            senderIdString: String(m.senderId),
             recipientId: m.recipientId,
             senderName: m.senderName
           })));
