@@ -95,28 +95,54 @@ export class MessageService {
   }
 
   getMessagesByUserId(userId: string): Observable<Message[]> {
-    console.log('Getting messages for userId:', userId);
+    console.log('💬 MessageService: Getting messages for userId:', userId, 'Type:', typeof userId);
     // Asegurar que tenemos los usuarios cargados
     return this.apiService.get<User[]>('users').pipe(
       switchMap(users => {
         this.usersCache = users;
-        console.log('Users loaded, fetching messages for userId:', userId);
+        console.log('💬 MessageService: Users loaded, fetching messages for userId:', userId);
         // El backend usa /messages/user/{userId}
         return this.apiService.get<any[]>(`messages/user/${userId}`);
       }),
+      tap(rawMessages => {
+        console.log('💬 MessageService: Raw messages from backend:', rawMessages);
+        console.log('💬 MessageService: Messages count from backend:', rawMessages?.length || 0);
+        if (rawMessages && rawMessages.length > 0) {
+          rawMessages.forEach((msg, index) => {
+            console.log(`💬 MessageService: Message ${index + 1}:`, {
+              id: msg.id,
+              senderId: msg.senderId,
+              senderIdType: typeof msg.senderId,
+              recipientId: msg.recipientId,
+              recipientIdType: typeof msg.recipientId,
+              senderName: msg.senderName,
+              content: msg.content?.substring(0, 50),
+              isRead: msg.isRead,
+              type: msg.type
+            });
+          });
+        } else {
+          console.warn('💬 MessageService: ⚠️ No messages returned from backend for userId:', userId);
+        }
+      }),
       map(messages => {
-        console.log('Raw messages from backend:', messages);
-        console.log('Messages count from backend:', messages?.length || 0);
         if (!messages || messages.length === 0) {
-          console.warn('No messages returned from backend');
+          console.warn('💬 MessageService: No messages to map');
           this.messagesSubject.next([]);
           return [];
         }
         const mappedMessages = messages.map(msg => {
-          console.log('Mapping message:', msg);
-          return this.mapToMessage(msg);
+          const mapped = this.mapToMessage(msg);
+          console.log('💬 MessageService: Mapped message:', {
+            id: mapped.id,
+            senderId: mapped.senderId,
+            recipientId: mapped.recipientId,
+            senderName: mapped.senderName,
+            isRead: mapped.isRead
+          });
+          return mapped;
         });
-        console.log('Mapped messages:', mappedMessages);
+        console.log('💬 MessageService: Total mapped messages:', mappedMessages.length);
         this.messagesSubject.next(mappedMessages);
         return mappedMessages;
       })

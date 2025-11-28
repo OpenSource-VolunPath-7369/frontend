@@ -45,12 +45,44 @@ export class NotificationService {
   }
 
   getNotificationsByUserId(userId: string): Observable<Notification[]> {
+    console.log('🔔 NotificationService: Getting notifications for userId:', userId, 'Type:', typeof userId);
     // El backend usa /notifications/user/{userId}
     return this.apiService.get<any[]>(`notifications/user/${userId}`).pipe(
+      tap(rawNotifications => {
+        console.log('🔔 NotificationService: Raw notifications from backend:', rawNotifications);
+        console.log('🔔 NotificationService: Notifications count:', rawNotifications?.length || 0);
+        if (rawNotifications && rawNotifications.length > 0) {
+          rawNotifications.forEach((notif, index) => {
+            console.log(`🔔 NotificationService: Notification ${index + 1}:`, {
+              id: notif.id,
+              userId: notif.userId,
+              userIdType: typeof notif.userId,
+              title: notif.title,
+              message: notif.message?.substring(0, 50),
+              type: notif.type,
+              isRead: notif.isRead,
+              actionUrl: notif.actionUrl
+            });
+          });
+        }
+      }),
       map(notifications => {
-        const mappedNotifications = notifications.map(notif => this.mapToNotification(notif));
+        const mappedNotifications = notifications.map(notif => {
+          const mapped = this.mapToNotification(notif);
+          console.log('🔔 NotificationService: Mapped notification:', {
+            id: mapped.id,
+            userId: mapped.userId,
+            title: mapped.title,
+            type: mapped.type
+          });
+          return mapped;
+        });
+        console.log('🔔 NotificationService: Total mapped notifications:', mappedNotifications.length);
         this.notificationsSubject.next(mappedNotifications);
         return mappedNotifications;
+      }),
+      tap(mappedNotifications => {
+        console.log('🔔 NotificationService: Final notifications to return:', mappedNotifications.length);
       })
     );
   }
