@@ -83,7 +83,15 @@ export default class NotificacionesPageComponent implements OnInit, OnDestroy {
   loadNotifications() {
     this.loading = true;
     this.currentUser = this.authService.getCurrentUser();
-    const userId = this.currentUser?.id || '1';
+    
+    if (!this.currentUser || !this.currentUser.id) {
+      this.error = 'Usuario no autenticado';
+      this.loading = false;
+      console.error('No user found or user ID missing');
+      return;
+    }
+    
+    const userId = String(this.currentUser.id);
     
     console.log('Loading notifications for user:', userId, 'Role:', this.currentUser?.role, 'Email:', this.currentUser?.email);
     
@@ -235,15 +243,15 @@ export default class NotificacionesPageComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle notification click - show message modal or navigate
+   * Handle notification click - navigate to appropriate page
    */
   onNotificationClick(notification: Notification) {
     // Marcar como leída
     this.markAsRead(notification);
 
-    // Si es un mensaje, mostrar modal con el mensaje completo
+    // Si es un mensaje, navegar directamente a la página de mensajes
     if (notification.type === 'new_message') {
-      this.loadAndShowMessage(notification);
+      this.router.navigate(['/mensajes']);
     } else if (notification.actionUrl) {
       // Si tiene una URL de acción, navegar a esa URL
       this.router.navigate([notification.actionUrl]);
@@ -257,9 +265,10 @@ export default class NotificacionesPageComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Load message and show in modal
+   * DEPRECATED: This method is no longer used. Notifications now navigate directly to /mensajes
+   * Kept for reference but can be removed in future cleanup.
    */
-  loadAndShowMessage(notification: Notification) {
+  private loadAndShowMessage(notification: Notification) {
     const userId = this.currentUser?.id || '1';
     const isOrganization = this.authService.isOrganization();
     
