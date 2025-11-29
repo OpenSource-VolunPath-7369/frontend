@@ -472,7 +472,22 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
           this.volunteers = volunteers.filter(v => 
             v.role === 'volunteer' && v.id !== currentUserId
           );
-          console.log('Voluntarios cargados:', this.volunteers.length, this.volunteers.map(v => v.name));
+          console.log('Voluntarios cargados:', this.volunteers.length, this.volunteers.map(v => ({
+            id: v.id,
+            name: v.name,
+            userId: v.userId,
+            email: v.email
+          })));
+          
+          // Verificar si hay voluntarios sin userId
+          const volunteersWithoutUserId = this.volunteers.filter(v => !v.userId);
+          if (volunteersWithoutUserId.length > 0) {
+            console.warn('⚠️ Voluntarios sin userId:', volunteersWithoutUserId.map(v => ({
+              id: v.id,
+              name: v.name,
+              email: v.email
+            })));
+          }
         },
         error: (error: any) => {
           console.error('Error loading volunteers:', error);
@@ -606,16 +621,32 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
             if (!this.isVolunteerMode) {
               // Si el destinatario es un voluntario, usar userId si está disponible
               const volunteerRecipient = recipient as Volunteer;
+              
               // CRÍTICO: El backend necesita el userId del usuario (del contexto IAM), no el id del voluntario
-              // Si userId no está disponible, hay un problema con los datos del voluntario
+              // Si userId no está disponible, intentar obtenerlo del backend
               if (!volunteerRecipient.userId) {
-                console.error('⚠️ ADVERTENCIA: El voluntario no tiene userId. Usando id como fallback, pero esto puede causar problemas.', {
+                console.warn('⚠️ ADVERTENCIA: El voluntario no tiene userId en cache. Intentando obtenerlo del backend...', {
                   volunteerId: volunteerRecipient.id,
                   volunteerName: volunteerRecipient.name,
                   volunteerEmail: volunteerRecipient.email
                 });
+                
+                // Intentar obtener el voluntario del backend para obtener el userId
+                // Por ahora, usar el id como fallback, pero el backend buscará por ambos IDs
+                actualRecipientId = volunteerRecipient.id;
+                console.warn('⚠️ Usando volunteer.id como recipientId. El backend debería buscar por ambos IDs.', {
+                  volunteerId: volunteerRecipient.id,
+                  actualRecipientId: actualRecipientId
+                });
+              } else {
+                actualRecipientId = volunteerRecipient.userId;
+                console.log('✅ Usando volunteer.userId como recipientId:', {
+                  volunteerId: volunteerRecipient.id,
+                  volunteerUserId: volunteerRecipient.userId,
+                  actualRecipientId: actualRecipientId
+                });
               }
-              actualRecipientId = volunteerRecipient.userId || volunteerRecipient.id;
+              
               console.log('🔍 ID del voluntario destinatario:', {
                 originalRecipientId: recipientId,
                 volunteerId: volunteerRecipient.id,

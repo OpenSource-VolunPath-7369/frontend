@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, map, switchMap, forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { ApiService } from '../shared/infrastructure/api.service';
 import { OrganizationProfile, UpdateOrganizationProfile } from '../interfaces/organization.interface';
 import { Organization } from '../organizations/domain/model/organization';
@@ -94,18 +95,29 @@ export class ProfileService {
         const updateOrg$ = this.apiService.put<any>(`organizations/${organizationId}`, updateOrgData);
 
         // Si tenemos userId, también actualizar el usuario en la tabla users
+        // Solo actualizar los campos que existen en la entidad User: name, email, avatar
         const updateUser$ = userId 
           ? this.apiService.get<any>(`users/${userId}`).pipe(
               switchMap((user: any) => {
                 const userUpdateData = {
-                  ...user,
                   name: profile.representativeName,
                   email: profile.representativeEmail,
-                  location: profile.organizationLocation,
-                  bio: `Organización: ${profile.organizationName}`,
                   avatar: currentLogo || user.avatar || '' // Preservar el avatar/logo del usuario
                 };
-                return this.apiService.put<any>(`users/${userId}`, userUpdateData);
+                console.log('Updating user with data:', { userId, userUpdateData });
+                return this.apiService.put<any>(`users/${userId}`, userUpdateData).pipe(
+                  map((updatedUser: any) => {
+                    console.log('User updated successfully:', updatedUser);
+                    return updatedUser;
+                  })
+                );
+              }),
+              // Manejar errores específicamente para la actualización de usuario
+              catchError((error: any) => {
+                console.error('Error updating user:', error);
+                // Si falla la actualización del usuario, continuar con la actualización de la organización
+                // pero loguear el error
+                return of(null);
               })
             )
           : of(null);
