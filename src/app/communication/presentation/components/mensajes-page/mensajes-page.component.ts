@@ -315,26 +315,46 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
 
   private loadMessagesForUser(userId: string, recipientIds: string[], organizationId?: string) {
     // Obtener mensajes del backend usando getMessagesByUserId
-    // Esto asegura que obtenemos los mensajes más recientes
-    this.messageService.getMessagesByUserId(userId)
+    // Si hay múltiples IDs (userId y volunteerId), hacer múltiples llamadas y combinar
+    const uniqueIds = Array.from(new Set([userId, ...recipientIds.map(id => String(id))]));
+    console.log('🔍 Buscando mensajes para múltiples IDs:', uniqueIds);
+    
+    // Hacer llamadas paralelas para cada ID único
+    const messageObservables = uniqueIds.map(id => 
+      this.messageService.getMessagesByUserId(String(id)).pipe(
+        catchError(error => {
+          console.error(`Error loading messages for userId ${id}:`, error);
+          return of([]); // Retornar array vacío si falla
+        })
+      )
+    );
+    
+    forkJoin(messageObservables)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (allMessages) => {
-          console.log('Total mensajes en BD:', allMessages.length);
-          console.log('IDs a buscar:', recipientIds);
+        next: (messagesArrays) => {
+          // Combinar todos los mensajes de todas las llamadas
+          const allMessages = messagesArrays.flat();
+          
+          // Eliminar duplicados por ID
+          const uniqueMessages = Array.from(
+            new Map(allMessages.map(msg => [msg.id, msg])).values()
+          );
+          
+          console.log('📨 Total mensajes combinados de todas las llamadas:', uniqueMessages.length);
+          console.log('IDs buscados:', uniqueIds);
           console.log('OrganizationId:', organizationId);
           
           // Normalizar todos los IDs a strings para comparación
           const normalizedRecipientIds = recipientIds.map(id => String(id));
           const normalizedUserId = String(userId);
           
-          // Mensajes recibidos: buscar por recipientId que coincida con userId o organizationId
-          // Convertir recipientId a string para comparación
-          const receivedMessages = allMessages.filter(msg => {
+          // Mensajes recibidos: buscar por recipientId que coincida con cualquiera de los IDs
+          const receivedMessages = uniqueMessages.filter(msg => {
             const msgRecipientId = String(msg.recipientId);
-            return normalizedRecipientIds.includes(msgRecipientId);
+            return normalizedRecipientIds.includes(msgRecipientId) || uniqueIds.includes(msgRecipientId);
           });
-          console.log('Mensajes recibidos (recipientId):', receivedMessages.length, receivedMessages.map(m => ({
+          console.log('📥 Mensajes recibidos (recipientId):', receivedMessages.length, receivedMessages.map(m => ({
             id: m.id,
             recipientId: m.recipientId,
             recipientIdType: typeof m.recipientId,
@@ -342,9 +362,12 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
             content: m.content.substring(0, 50)
           })));
           
-          // Mensajes enviados: buscar por senderId que coincida con userId
-          const sentMessages = allMessages.filter(msg => String(msg.senderId) === normalizedUserId);
-          console.log('Mensajes enviados (senderId):', sentMessages.length, sentMessages.map(m => ({
+          // Mensajes enviados: buscar por senderId que coincida con cualquiera de los IDs
+          const sentMessages = uniqueMessages.filter(msg => {
+            const msgSenderId = String(msg.senderId);
+            return uniqueIds.includes(msgSenderId);
+          });
+          console.log('📤 Mensajes enviados (senderId):', sentMessages.length, sentMessages.map(m => ({
             id: m.id,
             senderId: m.senderId,
             recipientId: m.recipientId,
@@ -352,14 +375,13 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
           })));
           
           // Mostrar mensajes recibidos Y enviados por el usuario actual
-          // El backend ya devuelve mensajes donde el usuario es sender o recipient
-          // Pero verificamos también por los recipientIds por si hay mensajes con diferentes IDs
-          this.messages = allMessages.filter(msg => {
+          // Incluir mensajes donde el usuario es recipient (usando cualquiera de los IDs) o sender
+          this.messages = uniqueMessages.filter(msg => {
             const msgRecipientId = String(msg.recipientId);
             const msgSenderId = String(msg.senderId);
             // Incluir si el mensaje es para el usuario (recipient) o del usuario (sender)
-            const isRecipient = normalizedRecipientIds.includes(msgRecipientId);
-            const isSender = msgSenderId === normalizedUserId;
+            const isRecipient = normalizedRecipientIds.includes(msgRecipientId) || uniqueIds.includes(msgRecipientId);
+            const isSender = uniqueIds.includes(msgSenderId);
             
             // Log para debugging
             if (!isRecipient && !isSender) {
@@ -369,6 +391,7 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
                 recipientId: msgRecipientId,
                 normalizedUserId: normalizedUserId,
                 normalizedRecipientIds: normalizedRecipientIds,
+                uniqueIds: uniqueIds,
                 isRecipient: isRecipient,
                 isSender: isSender
               });
@@ -379,7 +402,7 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
           
           // Debug: mostrar todos los mensajes y sus recipientIds
           console.log('=== DEBUG MENSAJES ===');
-          console.log('Todos los mensajes en BD:', allMessages.map(m => ({
+          console.log('Todos los mensajes combinados:', uniqueMessages.map(m => ({
             id: m.id,
             senderName: m.senderName,
             senderId: m.senderId,
@@ -387,11 +410,11 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
             recipientIdType: typeof m.recipientId,
             content: m.content.substring(0, 30)
           })));
-          console.log('IDs que estamos buscando:', recipientIds);
+          console.log('IDs que estamos buscando:', uniqueIds);
           // Verificar coincidencias con recipientIds (comparando como strings)
-          const matchingRecipient = allMessages.filter(msg => {
+          const matchingRecipient = uniqueMessages.filter(msg => {
             const msgRecipientId = String(msg.recipientId);
-            return normalizedRecipientIds.includes(msgRecipientId);
+            return normalizedRecipientIds.includes(msgRecipientId) || uniqueIds.includes(msgRecipientId);
           });
           console.log('Mensajes que coinciden con recipientIds:', matchingRecipient.length, matchingRecipient.map(m => ({
             id: m.id,
@@ -401,7 +424,7 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
           })));
           
           // Verificar coincidencias con senderId
-          const matchingSender = allMessages.filter(msg => String(msg.senderId) === normalizedUserId);
+          const matchingSender = uniqueMessages.filter(msg => uniqueIds.includes(String(msg.senderId)));
           console.log('Mensajes que coinciden con senderId:', matchingSender.length, matchingSender.map(m => ({
             id: m.id,
             senderId: m.senderId,
@@ -419,7 +442,7 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
           });
           
           this.loading = false;
-          console.log('Mensajes cargados:', this.messages.length, 'Total en BD:', allMessages.length);
+          console.log('Mensajes cargados:', this.messages.length, 'Total combinados:', uniqueMessages.length);
           console.log('Mensajes finales:', this.messages.map(m => ({ 
             id: m.id, 
             senderName: m.senderName,
@@ -448,15 +471,25 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
       });
 
     // Load unread count (solo mensajes recibidos)
-    // Para organizaciones, contar mensajes recibidos por cualquiera de los IDs
-    this.messageService.getMessagesByUserId(userId)
+    // Hacer las mismas llamadas múltiples para obtener el conteo correcto
+    const unreadCountObservables = uniqueIds.map(id => 
+      this.messageService.getMessagesByUserId(String(id)).pipe(
+        catchError(() => of([]))
+      )
+    );
+    
+    forkJoin(unreadCountObservables)
       .pipe(
         takeUntil(this.destroy$),
-        map(messages => {
-          const unreadMessages = messages.filter(msg => {
+        map(messagesArrays => {
+          const allMessages = messagesArrays.flat();
+          const uniqueMessages = Array.from(
+            new Map(allMessages.map(msg => [msg.id, msg])).values()
+          );
+          const normalizedRecipientIds = recipientIds.map(id => String(id));
+          const unreadMessages = uniqueMessages.filter(msg => {
             const msgRecipientId = String(msg.recipientId);
-            const normalizedRecipientIds = recipientIds.map(id => String(id));
-            return normalizedRecipientIds.includes(msgRecipientId) && msg.isUnread();
+            return (normalizedRecipientIds.includes(msgRecipientId) || uniqueIds.includes(String(msgRecipientId))) && msg.isUnread();
           });
           return unreadMessages.length;
         })
