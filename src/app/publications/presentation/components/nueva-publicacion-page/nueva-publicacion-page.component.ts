@@ -253,7 +253,9 @@ export default class NuevaPublicacionPageComponent implements OnInit, OnDestroy 
             // Intentar parsear como ISO
             try {
               const dateObj = new Date(formData.scheduledDate);
-              dateStr = dateObj.toISOString().split('T')[0];
+              if (!isNaN(dateObj.getTime())) {
+                dateStr = dateObj.toISOString().split('T')[0];
+              }
             } catch (e) {
               console.warn('Error parsing date:', formData.scheduledDate);
             }
@@ -270,25 +272,29 @@ export default class NuevaPublicacionPageComponent implements OnInit, OnDestroy 
         organizationId: formData.organizationId,
         tags: formData.tags ? formData.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0) : [],
         image: this.imagePreview || '/assets/img-ecologico.png',
-        date: dateStr, // Para el servicio, usar 'date' que luego se convertirá a scheduledDate
-        time: timeStr, // Para el servicio, usar 'time' que luego se convertirá a scheduledTime
         location: formData.location,
         maxVolunteers: parseInt(formData.maxVolunteers) || 0,
         currentVolunteers: 0, // Iniciar en 0 para nuevas publicaciones
         updatedAt: new Date().toISOString()
       };
 
-      // Solo agregar estos campos si es creación nueva
+      // Para creación, usar scheduledDate y scheduledTime directamente
+      // Para edición, usar date y time para que el servicio los convierta
       if (!this.isEditMode) {
         publicationData.status = 'published';
         publicationData.likes = 0;
         publicationData.createdAt = new Date().toISOString();
+        publicationData.scheduledDate = dateStr;
+        publicationData.scheduledTime = timeStr;
       } else {
-        // En modo edición, mantener el status actual si no se especifica
+        // En modo edición, usar date y time para que el servicio los convierta correctamente
         publicationData.status = formData.status || 'published';
+        publicationData.date = dateStr;
+        publicationData.time = timeStr;
       }
       
       console.log('Publication data prepared:', {
+        isEditMode: this.isEditMode,
         dateStr,
         timeStr,
         scheduledDate: formData.scheduledDate,
