@@ -153,13 +153,62 @@ export class PublicationService {
   }
 
   createPublication(publicationData: Partial<Publication>): Observable<Publication> {
-    const newPublication = {
-      ...publicationData,
-      likes: publicationData.likes ?? 0,
+    // Convertir date y time a scheduledDate y scheduledTime para el backend
+    let scheduledDate = '';
+    if (publicationData.date) {
+      if (typeof publicationData.date === 'string' && publicationData.date.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        // Convertir DD/MM/YYYY a YYYY-MM-DD
+        const [day, month, year] = publicationData.date.split('/');
+        scheduledDate = `${year}-${month}-${day}`;
+      } else if (typeof publicationData.date === 'string' && publicationData.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        scheduledDate = publicationData.date;
+      } else if (publicationData.date instanceof Date) {
+        scheduledDate = publicationData.date.toISOString().split('T')[0];
+      } else {
+        try {
+          const dateObj = new Date(publicationData.date as any);
+          if (!isNaN(dateObj.getTime())) {
+            scheduledDate = dateObj.toISOString().split('T')[0];
+          }
+        } catch (e) {
+          console.warn('Error parsing date:', publicationData.date);
+        }
+      }
+    }
+    
+    const scheduledTime = publicationData.time || '';
+    
+    const newPublication: any = {
+      title: publicationData.title,
+      description: publicationData.description,
+      image: publicationData.image,
+      organizationId: publicationData.organizationId ? Number(publicationData.organizationId) : undefined,
+      tags: publicationData.tags || [],
       status: this.mapFrontendPublicationStatusToBackend(publicationData.status ?? 'published'),
+      scheduledDate: scheduledDate || undefined,
+      scheduledTime: scheduledTime || undefined,
+      location: publicationData.location,
+      maxVolunteers: publicationData.maxVolunteers ?? 0,
+      currentVolunteers: publicationData.currentVolunteers ?? 0,
+      likes: publicationData.likes ?? 0,
       createdAt: publicationData.createdAt ?? new Date().toISOString(),
       updatedAt: publicationData.updatedAt ?? new Date().toISOString()
     };
+    
+    // Eliminar campos undefined
+    Object.keys(newPublication).forEach(key => {
+      if (newPublication[key] === undefined) {
+        delete newPublication[key];
+      }
+    });
+
+    console.log('Creating publication with data:', {
+      originalDate: publicationData.date,
+      originalTime: publicationData.time,
+      scheduledDate,
+      scheduledTime,
+      newPublication
+    });
 
     return this.apiService.post<any>('publications', newPublication).pipe(
       map(pub => this.mapToPublication(pub)),
