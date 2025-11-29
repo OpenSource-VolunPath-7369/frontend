@@ -352,7 +352,8 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
           // Mensajes recibidos: buscar por recipientId que coincida con cualquiera de los IDs
           const receivedMessages = uniqueMessages.filter(msg => {
             const msgRecipientId = String(msg.recipientId);
-            return normalizedRecipientIds.includes(msgRecipientId) || uniqueIds.includes(msgRecipientId);
+            const uniqueIdsStrings = uniqueIds.map(id => String(id));
+            return normalizedRecipientIds.includes(msgRecipientId) || uniqueIdsStrings.includes(msgRecipientId);
           });
           console.log('📥 Mensajes recibidos (recipientId):', receivedMessages.length, receivedMessages.map(m => ({
             id: m.id,
@@ -365,7 +366,8 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
           // Mensajes enviados: buscar por senderId que coincida con cualquiera de los IDs
           const sentMessages = uniqueMessages.filter(msg => {
             const msgSenderId = String(msg.senderId);
-            return uniqueIds.includes(msgSenderId);
+            const uniqueIdsStrings = uniqueIds.map(id => String(id));
+            return uniqueIdsStrings.includes(msgSenderId);
           });
           console.log('📤 Mensajes enviados (senderId):', sentMessages.length, sentMessages.map(m => ({
             id: m.id,
@@ -380,8 +382,9 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
             const msgRecipientId = String(msg.recipientId);
             const msgSenderId = String(msg.senderId);
             // Incluir si el mensaje es para el usuario (recipient) o del usuario (sender)
-            const isRecipient = normalizedRecipientIds.includes(msgRecipientId) || uniqueIds.includes(msgRecipientId);
-            const isSender = uniqueIds.includes(msgSenderId);
+            const uniqueIdsStrings = uniqueIds.map(id => String(id));
+            const isRecipient = normalizedRecipientIds.includes(msgRecipientId) || uniqueIdsStrings.includes(msgRecipientId);
+            const isSender = uniqueIdsStrings.includes(msgSenderId);
             
             // Log para debugging
             if (!isRecipient && !isSender) {
@@ -412,9 +415,10 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
           })));
           console.log('IDs que estamos buscando:', uniqueIds);
           // Verificar coincidencias con recipientIds (comparando como strings)
+          const uniqueIdsStrings = uniqueIds.map(id => String(id));
           const matchingRecipient = uniqueMessages.filter(msg => {
             const msgRecipientId = String(msg.recipientId);
-            return normalizedRecipientIds.includes(msgRecipientId) || uniqueIds.includes(msgRecipientId);
+            return normalizedRecipientIds.includes(msgRecipientId) || uniqueIdsStrings.includes(msgRecipientId);
           });
           console.log('Mensajes que coinciden con recipientIds:', matchingRecipient.length, matchingRecipient.map(m => ({
             id: m.id,
@@ -424,7 +428,8 @@ export default class MensajesPageComponent implements OnInit, OnDestroy {
           })));
           
           // Verificar coincidencias con senderId
-          const matchingSender = uniqueMessages.filter(msg => uniqueIds.includes(String(msg.senderId)));
+          const uniqueIdsStringsForSender = uniqueIds.map(id => String(id));
+          const matchingSender = uniqueMessages.filter(msg => uniqueIdsStringsForSender.includes(String(msg.senderId)));
           console.log('Mensajes que coinciden con senderId:', matchingSender.length, matchingSender.map(m => ({
             id: m.id,
             senderId: m.senderId,
