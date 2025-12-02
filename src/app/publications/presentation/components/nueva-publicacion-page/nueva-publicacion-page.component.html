@@ -138,9 +138,9 @@
           <!-- Fecha programada -->
           <mat-form-field appearance="fill" class="half-width">
             <mat-label>{{ 'publication.scheduledDate' | translate }}</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="scheduledDate" [required]="true">
+            <input matInput [matDatepicker]="picker" formControlName="scheduledDate" [required]="true" [matDatepickerMin]="minDate">
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker [min]="minDate"></mat-datepicker>
+            <mat-datepicker #picker></mat-datepicker>
             <mat-error *ngIf="publicationForm.get('scheduledDate')?.hasError('required')">
               {{ 'publication.dateRequired' | translate }}
             </mat-error>
