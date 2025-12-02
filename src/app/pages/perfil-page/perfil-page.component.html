@@ -74,7 +74,7 @@
 
           <!-- Habilidades -->
           <div class="section" *ngIf="volunteerProfile.skills && volunteerProfile.skills.length > 0">
-            <h3 class="section-title">Habilidades</h3>
+            <h3 class="section-title">{{ 'profile.skills' | translate }}</h3>
             <div class="skills-container">
               <mat-chip-set>
                 <mat-chip *ngFor="let skill of volunteerProfile.skills">{{ skill }}</mat-chip>
@@ -86,16 +86,16 @@
         <!-- Modo de edición -->
         <form *ngIf="isEditing" [formGroup]="profileForm" class="edit-form">
           <div class="section">
-            <h3 class="section-title">*Datos personales</h3>
+            <h3 class="section-title">{{ 'profile.personalData' | translate }}</h3>
             <div class="form-grid">
               <mat-form-field appearance="fill" class="full-width">
-                <mat-label>Nombre completo *</mat-label>
+                <mat-label>{{ 'profile.fullName' | translate }} *</mat-label>
                 <input matInput formControlName="name">
                 <mat-error *ngIf="profileForm.get('name')?.hasError('required')">
-                  El nombre es requerido
+                  {{ 'profile.fullNameRequired' | translate }}
                 </mat-error>
                 <mat-error *ngIf="profileForm.get('name')?.hasError('minlength')">
-                  El nombre debe tener al menos 3 caracteres
+                  {{ 'profile.fullNameMinLength' | translate }}
                 </mat-error>
               </mat-form-field>
 
@@ -142,22 +142,22 @@
         <div *ngIf="!isEditing">
         <!-- Datos de la organización -->
         <div class="section">
-          <h3 class="section-title">*Datos de la organización</h3>
+          <h3 class="section-title">{{ 'profile.organizationData' | translate }}</h3>
           <div class="data-grid">
             <div class="data-item">
-              <span class="data-label">Nombre:</span>
+              <span class="data-label">{{ 'profile.name' | translate }}</span>
               <span class="data-value">{{ profile.organization.name }}</span>
             </div>
             <div class="data-item">
-              <span class="data-label">Correo:</span>
+              <span class="data-label">{{ 'profile.email' | translate }}</span>
               <span class="data-value">{{ profile.organization.email }}</span>
             </div>
             <div class="data-item">
-              <span class="data-label">Ubicación:</span>
+              <span class="data-label">{{ 'profile.location' | translate }}</span>
               <span class="data-value">{{ profile.organization.location }}</span>
             </div>
             <div class="data-item">
-              <span class="data-label">Teléfono:</span>
+              <span class="data-label">{{ 'profile.phone' | translate }}</span>
               <span class="data-value">{{ profile.organization.phone }}</span>
             </div>
           </div>
@@ -165,7 +165,7 @@
 
         <!-- Tipo de organización -->
         <div class="section">
-          <h3 class="section-title">*Tipo de organización:</h3>
+          <h3 class="section-title">{{ 'profile.organizationType' | translate }}</h3>
           <div class="data-item">
             <span class="data-value">{{ profile.organization.type }}</span>
           </div>
@@ -173,14 +173,14 @@
 
         <!-- Datos del representante -->
         <div class="section">
-          <h3 class="section-title">*Datos del representante</h3>
+          <h3 class="section-title">{{ 'profile.representativeData' | translate }}</h3>
           <div class="data-grid">
             <div class="data-item">
-              <span class="data-label">Nombre:</span>
+              <span class="data-label">{{ 'profile.name' | translate }}</span>
               <span class="data-value">{{ profile.representative.name }}</span>
             </div>
             <div class="data-item">
-              <span class="data-label">Correo:</span>
+              <span class="data-label">{{ 'profile.email' | translate }}</span>
               <span class="data-value">{{ profile.representative.email }}</span>
             </div>
           </div>
@@ -191,7 +191,7 @@
       <form *ngIf="isEditing" [formGroup]="profileForm" class="edit-form">
         <!-- Datos de la organización -->
         <div class="section">
-          <h3 class="section-title">*Datos de la organización</h3>
+          <h3 class="section-title">{{ 'profile.organizationData' | translate }}</h3>
           <div class="form-grid">
             <mat-form-field appearance="fill" class="full-width">
               <mat-label>Nombre de la organización *</mat-label>
@@ -235,7 +235,7 @@
 
         <!-- Tipo de organización -->
         <div class="section">
-          <h3 class="section-title">*Tipo de organización</h3>
+          <h3 class="section-title">{{ 'profile.organizationType' | translate }}</h3>
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Selecciona el tipo *</mat-label>
             <mat-select formControlName="organizationType">
@@ -251,7 +251,7 @@
 
         <!-- Datos del representante -->
         <div class="section">
-          <h3 class="section-title">*Datos del representante</h3>
+          <h3 class="section-title">{{ 'profile.representativeData' | translate }}</h3>
           <div class="form-grid">
             <mat-form-field appearance="fill" class="full-width">
               <mat-label>Nombre completo *</mat-label>
@@ -285,25 +285,25 @@
       <div *ngIf="!isEditing" class="action-buttons">
         <button mat-button (click)="onUpdatePassword()">
           <mat-icon>lock</mat-icon>
-          Actualizar contraseña
+          {{ 'profile.updatePassword' | translate }}
         </button>
         <button mat-raised-button color="primary" (click)="onEditProfile()">
           <mat-icon>edit</mat-icon>
-          Editar información de perfil
+          {{ 'profile.editProfileInfo' | translate }}
         </button>
       </div>
 
       <div *ngIf="isEditing" class="edit-buttons">
         <button mat-button (click)="onCancelEdit()">
           <mat-icon>close</mat-icon>
-          Cancelar
+          {{ 'profile.cancel' | translate }}
         </button>
         <button mat-raised-button color="primary" 
                 [disabled]="!profileForm.valid || loading"
                 (click)="onSaveProfile()">
           <mat-icon *ngIf="!loading">save</mat-icon>
-          <span *ngIf="loading">Guardando...</span>
-          <span *ngIf="!loading">Guardar cambios</span>
+          <span *ngIf="loading">{{ 'profile.saving' | translate }}</span>
+          <span *ngIf="!loading">{{ 'profile.save' | translate }}</span>
         </button>
       </div>
     </mat-card-actions>
