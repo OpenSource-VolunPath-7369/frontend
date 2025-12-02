@@ -106,6 +106,16 @@ export default class NuevaPublicacionPageComponent implements OnInit, OnDestroy 
     });
     
     this.loadOrganizations();
+    
+    // Listen to date changes to validate in real-time
+    this.publicationForm.get('scheduledDate')?.valueChanges.subscribe(() => {
+      const dateControl = this.publicationForm.get('scheduledDate');
+      if (dateControl && dateControl.value) {
+        // Trigger validation
+        dateControl.updateValueAndValidity();
+      }
+    });
+    
     console.log('NuevaPublicacionPageComponent initialized', { isEditMode: this.isEditMode, publicationId: this.publicationId });
   }
 
@@ -415,16 +425,39 @@ export default class NuevaPublicacionPageComponent implements OnInit, OnDestroy 
       return null; // Let required validator handle empty values
     }
     
-    const selectedDate = new Date(control.value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    selectedDate.setHours(0, 0, 0, 0);
-    
-    if (selectedDate < today) {
-      return { pastDate: true };
+    try {
+      // Handle both Date objects and string dates
+      let selectedDate: Date;
+      if (control.value instanceof Date) {
+        selectedDate = new Date(control.value);
+      } else if (typeof control.value === 'string') {
+        selectedDate = new Date(control.value);
+      } else {
+        return null;
+      }
+      
+      // Check if date is valid
+      if (isNaN(selectedDate.getTime())) {
+        return null; // Invalid date, let other validators handle it
+      }
+      
+      // Get today's date at midnight
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Set selected date to midnight for accurate comparison
+      selectedDate.setHours(0, 0, 0, 0);
+      
+      // Check if selected date is before or equal to today
+      if (selectedDate <= today) {
+        return { pastDate: true };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error validating date:', error);
+      return null;
     }
-    
-    return null;
   }
 }
 
