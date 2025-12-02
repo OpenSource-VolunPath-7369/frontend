@@ -138,14 +138,11 @@
           <!-- Fecha programada -->
           <mat-form-field appearance="fill" class="half-width">
             <mat-label>{{ 'publication.scheduledDate' | translate }}</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="scheduledDate" [required]="true" [min]="minDate">
+            <input matInput [matDatepicker]="picker" formControlName="scheduledDate" [required]="true">
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker [startAt]="minDate" [min]="minDate"></mat-datepicker>
+            <mat-datepicker #picker [min]="minDate"></mat-datepicker>
             <mat-error *ngIf="publicationForm.get('scheduledDate')?.hasError('required')">
               {{ 'publication.dateRequired' | translate }}
-            </mat-error>
-            <mat-error *ngIf="publicationForm.get('scheduledDate')?.hasError('pastDate')">
-              {{ 'publication.pastDateError' | translate }}
             </mat-error>
           </mat-form-field>
 
@@ -155,9 +152,6 @@
             <input matInput type="time" formControlName="time">
             <mat-error *ngIf="publicationForm.get('time')?.hasError('required')">
               {{ 'publication.timeRequired' | translate }}
-            </mat-error>
-            <mat-error *ngIf="publicationForm.get('time')?.hasError('pastTime')">
-              {{ 'publication.pastTimeError' | translate }}
             </mat-error>
           </mat-form-field>
         </div>
