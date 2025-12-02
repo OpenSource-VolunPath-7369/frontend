@@ -13,8 +13,8 @@
 
     <!-- Welcome Message -->
     <div class="welcome-section">
-      <h2 class="welcome-title">Bienvenido!</h2>
-      <p class="welcome-subtitle">Ingresa tu cuenta</p>
+      <h2 class="welcome-title">{{ 'auth.login.title' | translate }}</h2>
+      <p class="welcome-subtitle">{{ 'auth.login.subtitle' | translate }}</p>
     </div>
 
     <!-- Error Message -->
@@ -27,22 +27,22 @@
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       <!-- Username Field -->
       <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Usuario</mat-label>
+        <mat-label>{{ 'auth.login.username' | translate }}</mat-label>
         <mat-icon matPrefix>person</mat-icon>
         <input matInput 
                formControlName="username" 
                autocomplete="username">
         <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
-          El usuario es requerido
+          {{ 'auth.login.usernameRequired' | translate }}
         </mat-error>
         <mat-error *ngIf="loginForm.get('username')?.hasError('minlength')">
-          El usuario debe tener al menos 3 caracteres
+          {{ 'auth.login.usernameMinLength' | translate }}
         </mat-error>
       </mat-form-field>
 
       <!-- Password Field -->
       <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Contraseña</mat-label>
+        <mat-label>{{ 'auth.login.password' | translate }}</mat-label>
         <mat-icon matPrefix>lock</mat-icon>
         <input matInput 
                [type]="hidePassword ? 'password' : 'text'"
@@ -52,25 +52,25 @@
                 matSuffix 
                 (click)="togglePasswordVisibility()" 
                 type="button"
-                [attr.aria-label]="'Ocultar contraseña'"
+                [attr.aria-label]="'auth.login.hidePassword' | translate"
                 [attr.aria-pressed]="hidePassword">
           <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
         <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-          La contraseña es requerida
+          {{ 'auth.login.passwordRequired' | translate }}
         </mat-error>
         <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">
-          La contraseña debe tener al menos 6 caracteres
+          {{ 'auth.login.passwordMinLength' | translate }}
         </mat-error>
       </mat-form-field>
 
       <!-- Remember Me and Forgot Password -->
       <div class="form-options">
         <mat-checkbox formControlName="rememberMe" class="remember-me">
-          Recuérdame
+          {{ 'auth.login.rememberMe' | translate }}
         </mat-checkbox>
         <a href="#" (click)="onForgotPassword(); $event.preventDefault()" class="forgot-password">
-          ¿Olvidaste tu contraseña?
+          {{ 'auth.login.forgotPassword' | translate }}
         </a>
       </div>
 
@@ -82,16 +82,16 @@
               [disabled]="loading || loginForm.invalid">
         <mat-icon *ngIf="!loading">login</mat-icon>
         <mat-icon *ngIf="loading" class="spinning">refresh</mat-icon>
-        <span>{{ loading ? 'Ingresando...' : 'Ingresar' }}</span>
+        <span>{{ loading ? ('auth.login.loggingIn' | translate) : ('auth.login.loginButton' | translate) }}</span>
       </button>
     </form>
 
     <!-- Register Link -->
     <div class="register-section">
       <p class="register-text">
-        ¿Aún no tienes cuenta? 
+        {{ 'auth.login.noAccount' | translate }} 
         <a href="#" (click)="onRegister(); $event.preventDefault()" class="register-link">
-          Regístrate Aquí
+          {{ 'auth.login.registerHere' | translate }}
         </a>
       </p>
     </div>

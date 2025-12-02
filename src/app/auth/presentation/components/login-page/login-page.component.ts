@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../../application/services/auth.service';
 import { ApiService } from '../../../../shared/infrastructure/api.service';
 import { User } from '../../../../interfaces';
@@ -25,7 +26,8 @@ import { of } from 'rxjs';
     MatButtonModule,
     MatCheckboxModule,
     MatIconModule,
-    MatSelectModule
+    MatSelectModule,
+    TranslatePipe
   ],
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.css']

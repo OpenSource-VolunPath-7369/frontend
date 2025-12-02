@@ -9,6 +9,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../../application/services/auth.service';
 import { VolunteerService } from '../../../../volunteers/application/services/volunteer.service';
 import { ApiService } from '../../../../shared/infrastructure/api.service';
@@ -30,7 +31,8 @@ import { switchMap, catchError, map, tap } from 'rxjs/operators';
     MatButtonModule,
     MatRadioModule,
     MatIconModule,
-    MatSelectModule
+    MatSelectModule,
+    TranslatePipe
   ],
   templateUrl: './register-page.component.html',
   styleUrls: ['./register-page.component.css']
