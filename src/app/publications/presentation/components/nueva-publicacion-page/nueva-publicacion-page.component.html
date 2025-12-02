@@ -138,11 +138,14 @@
           <!-- Fecha programada -->
           <mat-form-field appearance="fill" class="half-width">
             <mat-label>{{ 'publication.scheduledDate' | translate }}</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="scheduledDate" [required]="true" [matDatepickerMin]="minDate">
+            <input matInput [matDatepicker]="picker" formControlName="scheduledDate" [required]="true">
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
             <mat-error *ngIf="publicationForm.get('scheduledDate')?.hasError('required')">
               {{ 'publication.dateRequired' | translate }}
+            </mat-error>
+            <mat-error *ngIf="publicationForm.get('scheduledDate')?.hasError('pastDate')">
+              La fecha debe ser futura
             </mat-error>
           </mat-form-field>
 

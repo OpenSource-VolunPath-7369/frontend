@@ -78,7 +78,7 @@ export default class NuevaPublicacionPageComponent implements OnInit, OnDestroy 
       organizationId: ['', Validators.required],
       tags: [''],
       isPublic: [true],
-      scheduledDate: ['', Validators.required],
+      scheduledDate: ['', [Validators.required, this.futureDateValidator.bind(this)]],
       time: ['', Validators.required],
       location: ['', Validators.required],
       maxVolunteers: ['', [Validators.required, Validators.min(1)]]
@@ -405,6 +405,26 @@ export default class NuevaPublicacionPageComponent implements OnInit, OnDestroy 
 
   retry() {
     this.loadOrganizations();
+  }
+
+  /**
+   * Custom validator to ensure the date is in the future
+   */
+  private futureDateValidator(control: any): { [key: string]: any } | null {
+    if (!control.value) {
+      return null; // Let required validator handle empty values
+    }
+    
+    const selectedDate = new Date(control.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    selectedDate.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      return { pastDate: true };
+    }
+    
+    return null;
   }
 }
 
