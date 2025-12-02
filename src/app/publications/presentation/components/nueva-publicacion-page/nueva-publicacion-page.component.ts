@@ -54,6 +54,7 @@ export default class NuevaPublicacionPageComponent implements OnInit, OnDestroy 
   error: string | null = null;
   isEditMode = false;
   publicationId: string | null = null;
+  minDate: Date; // Fecha mínima permitida (hoy)
   
   private destroy$ = new Subject<void>();
 
@@ -64,13 +65,18 @@ export default class NuevaPublicacionPageComponent implements OnInit, OnDestroy 
     private publicationService: PublicationService,
     private organizationService: OrganizationService
   ) {
+    // Establecer la fecha mínima como hoy (sin horas, minutos, segundos)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    this.minDate = today;
+    
     this.publicationForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(5)]],
       description: ['', [Validators.required, Validators.minLength(20)]],
       organizationId: ['', Validators.required],
       tags: [''],
       isPublic: [true],
-      scheduledDate: ['', Validators.required],
+      scheduledDate: ['', [Validators.required, this.futureDateValidator.bind(this)]],
       time: ['', Validators.required],
       location: ['', Validators.required],
       maxVolunteers: ['', [Validators.required, Validators.min(1)]]
@@ -84,6 +90,75 @@ export default class NuevaPublicacionPageComponent implements OnInit, OnDestroy 
         this.publicationForm.get('organizationId')?.enable();
       }
     });
+
+    // Validar hora cuando cambie la fecha (para asegurar que si la fecha es hoy, la hora sea futura)
+    this.publicationForm.get('scheduledDate')?.valueChanges.subscribe(date => {
+      if (date) {
+        const selectedDate = new Date(date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        selectedDate.setHours(0, 0, 0, 0);
+        
+        // Si la fecha es hoy, validar la hora
+        if (selectedDate.getTime() === today.getTime()) {
+          const timeControl = this.publicationForm.get('time');
+          if (timeControl?.value) {
+            this.validateTimeForToday(timeControl);
+          }
+        } else {
+          // Si la fecha no es hoy, limpiar el error de hora pasada
+          const timeControl = this.publicationForm.get('time');
+          if (timeControl?.hasError('pastTime')) {
+            timeControl.setErrors(null);
+            timeControl.updateValueAndValidity();
+          }
+        }
+      }
+    });
+
+    // Validar hora cuando cambie
+    this.publicationForm.get('time')?.valueChanges.subscribe(time => {
+      if (time && this.publicationForm.get('scheduledDate')?.value) {
+        const date = new Date(this.publicationForm.get('scheduledDate')?.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        date.setHours(0, 0, 0, 0);
+        
+        if (date.getTime() === today.getTime()) {
+          this.validateTimeForToday(this.publicationForm.get('time'));
+        }
+      }
+    });
+  }
+
+  /**
+   * Valida que la hora sea futura si la fecha es hoy
+   */
+  private validateTimeForToday(timeControl: any): void {
+    if (!timeControl || !timeControl.value) {
+      return;
+    }
+
+    const now = new Date();
+    const [hours, minutes] = timeControl.value.split(':').map(Number);
+    const selectedDateTime = new Date();
+    selectedDateTime.setHours(hours, minutes, 0, 0);
+    
+    if (selectedDateTime <= now) {
+      timeControl.setErrors({ pastTime: true });
+    } else {
+      // Limpiar el error si la hora es válida
+      const errors = timeControl.errors;
+      if (errors && errors['pastTime']) {
+        delete errors['pastTime'];
+        if (Object.keys(errors).length === 0) {
+          timeControl.setErrors(null);
+        } else {
+          timeControl.setErrors(errors);
+        }
+      }
+    }
+    timeControl.updateValueAndValidity();
   }
 
   ngOnInit() {
@@ -224,6 +299,38 @@ export default class NuevaPublicacionPageComponent implements OnInit, OnDestroy 
         this.submitting = false;
         this.publicationForm.get('organizationId')?.markAsTouched();
         return;
+      }
+
+      // Validar que la fecha no sea pasada
+      if (formData.scheduledDate) {
+        const selectedDate = new Date(formData.scheduledDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        selectedDate.setHours(0, 0, 0, 0);
+        
+        if (selectedDate < today) {
+          this.error = 'La fecha no puede ser anterior a la fecha actual';
+          this.submitting = false;
+          this.publicationForm.get('scheduledDate')?.setErrors({ pastDate: true });
+          this.publicationForm.get('scheduledDate')?.markAsTouched();
+          return;
+        }
+        
+        // Si la fecha es hoy, validar que la hora sea futura
+        if (selectedDate.getTime() === today.getTime() && formData.time) {
+          const now = new Date();
+          const [hours, minutes] = formData.time.split(':').map(Number);
+          const selectedDateTime = new Date();
+          selectedDateTime.setHours(hours, minutes, 0, 0);
+          
+          if (selectedDateTime <= now) {
+            this.error = 'La hora debe ser mayor a la hora actual si la fecha es hoy';
+            this.submitting = false;
+            this.publicationForm.get('time')?.setErrors({ pastTime: true });
+            this.publicationForm.get('time')?.markAsTouched();
+            return;
+          }
+        }
       }
 
       // Preparar fecha en formato YYYY-MM-DD
@@ -397,6 +504,27 @@ export default class NuevaPublicacionPageComponent implements OnInit, OnDestroy 
 
   retry() {
     this.loadOrganizations();
+  }
+
+  /**
+   * Validador personalizado para asegurar que la fecha no sea pasada
+   */
+  futureDateValidator(control: any): { [key: string]: any } | null {
+    if (!control.value) {
+      return null; // Si no hay valor, el validador 'required' se encargará
+    }
+
+    const selectedDate = new Date(control.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    // Si la fecha seleccionada es anterior a hoy, retornar error
+    if (selectedDate < today) {
+      return { pastDate: true };
+    }
+
+    return null; // La fecha es válida
   }
 }
 

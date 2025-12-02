@@ -177,6 +177,8 @@
     "scheduledDate": "Fecha programada *",
     "time": "Hora *",
     "dateRequired": "La fecha es requerida",
+    "pastDateError": "La fecha no puede ser anterior a la fecha actual",
+    "pastTimeError": "La hora debe ser mayor a la hora actual si la fecha es hoy",
     "timeRequired": "La hora es requerida",
     "location": "Lugar *",
     "locationRequired": "El lugar es requerido",

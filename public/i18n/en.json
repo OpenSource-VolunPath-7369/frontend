@@ -177,6 +177,8 @@
     "scheduledDate": "Scheduled date *",
     "time": "Time *",
     "dateRequired": "Date is required",
+    "pastDateError": "Date cannot be in the past",
+    "pastTimeError": "Time must be greater than current time if date is today",
     "timeRequired": "Time is required",
     "location": "Location *",
     "locationRequired": "Location is required",
