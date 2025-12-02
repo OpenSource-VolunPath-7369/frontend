@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Subject, takeUntil, forkJoin, Observable } from 'rxjs';
 import { VolunteerService } from '../../../../volunteers/application/services/volunteer.service';
 import { MessageService } from '../../../application/services/message.service';
@@ -25,7 +26,8 @@ import { Message } from '../../../domain/model/message';
     MatButtonModule,
     MatDialogModule,
     MatCheckboxModule,
-    MatIconModule
+    MatIconModule,
+    TranslatePipe
   ],
   templateUrl: './send-message-to-volunteers-modal.component.html',
   styleUrls: ['./send-message-to-volunteers-modal.component.css']

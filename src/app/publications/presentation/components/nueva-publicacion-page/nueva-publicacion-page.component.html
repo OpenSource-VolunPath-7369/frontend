@@ -1,14 +1,14 @@
 <div class="form-container">
   <div class="form-header">
-    <h1 class="form-title">{{ isEditMode ? 'Editar Publicación' : 'Nueva Publicación' }}</h1>
-    <p class="form-subtitle">{{ isEditMode ? 'Modifica los detalles de tu publicación' : 'Comparte una nueva actividad con la comunidad y conecta con otros voluntarios' }}</p>
+    <h1 class="form-title">{{ isEditMode ? ('publication.edit' | translate) : ('publication.new' | translate) }}</h1>
+    <p class="form-subtitle">{{ isEditMode ? ('publication.editSubtitle' | translate) : ('publication.newSubtitle' | translate) }}</p>
   </div>
 
   <!-- Estados de carga y error -->
   <div *ngIf="loading" class="flex justify-center items-center py-12">
     <div class="text-center">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-      <p class="mt-4 text-gray-600">Cargando organizaciones...</p>
+      <p class="mt-4 text-gray-600">{{ 'publication.loadingOrganizations' | translate }}</p>
     </div>
   </div>
 
@@ -18,7 +18,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" />
       </svg>
     </div>
-    <h3 class="text-lg font-medium text-gray-900 mb-2">Error al cargar organizaciones</h3>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">{{ 'publication.errorLoadingOrganizations' | translate }}</h3>
     <p class="text-gray-600 mb-4">{{ error }}</p>
     <button 
       (click)="retry()" 
@@ -26,7 +26,7 @@
       <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
       </svg>
-      Reintentar
+      {{ 'common.retry' | translate }}
     </button>
   </div>
 
@@ -45,10 +45,10 @@
       <form [formGroup]="publicationForm" (ngSubmit)="onSubmit()">
         <!-- Título -->
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Título *</mat-label>
+          <mat-label>{{ 'publication.title' | translate }}</mat-label>
           <input matInput formControlName="title">
           <mat-error *ngIf="publicationForm.get('title')?.hasError('required')">
-            El título es requerido
+            {{ 'publication.titleRequired' | translate }}
           </mat-error>
           <mat-error *ngIf="publicationForm.get('title')?.hasError('minlength')">
             El título debe tener al menos 5 caracteres
@@ -57,11 +57,11 @@
 
         <!-- Descripción -->
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Descripción *</mat-label>
+          <mat-label>{{ 'publication.description' | translate }}</mat-label>
           <textarea matInput formControlName="description" 
                     rows="3"></textarea>
           <mat-error *ngIf="publicationForm.get('description')?.hasError('required')">
-            La descripción es requerida
+            {{ 'publication.descriptionRequired' | translate }}
           </mat-error>
           <mat-error *ngIf="publicationForm.get('description')?.hasError('minlength')">
             La descripción debe tener al menos 20 caracteres
@@ -81,10 +81,10 @@
             <button mat-raised-button color="primary" type="button" (click)="selectImage()" 
                     class="select-image-button">
               <mat-icon>camera_alt</mat-icon>
-              Seleccionar imagen
+              {{ 'publication.selectImage' | translate }}
             </button>
             <p class="image-upload-hint">
-              Formatos soportados: JPG, PNG, GIF (máx. 5MB)
+              {{ 'publication.imageFormats' | translate }}
             </p>
           </div>
           
@@ -99,37 +99,37 @@
 
         <!-- Organización -->
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Organización *</mat-label>
+          <mat-label>{{ 'publication.organization' | translate }}</mat-label>
           <mat-select formControlName="organizationId">
             <mat-option *ngIf="organizations.length === 0" disabled>
-              No hay organizaciones disponibles
+              {{ 'publication.noOrganizationsAvailable' | translate }}
             </mat-option>
             <mat-option *ngFor="let org of organizations" [value]="org.id">
               {{ org.name }}
             </mat-option>
           </mat-select>
           <mat-error *ngIf="publicationForm.get('organizationId')?.hasError('required') && publicationForm.get('organizationId')?.touched">
-            La organización es requerida
+            {{ 'publication.organizationRequired' | translate }}
           </mat-error>
           <mat-hint *ngIf="organizations.length === 0" class="text-red-600">
-            No se pudieron cargar las organizaciones. Por favor recarga la página.
+            {{ 'publication.organizationLoadError' | translate }}
           </mat-hint>
         </mat-form-field>
 
         <!-- Tags -->
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Tags</mat-label>
+          <mat-label>{{ 'publication.tags' | translate }}</mat-label>
           <input matInput formControlName="tags">
-          <mat-hint>Agrega etiquetas para que tu publicación sea más fácil de encontrar</mat-hint>
+          <mat-hint>{{ 'publication.tagsHint' | translate }}</mat-hint>
         </mat-form-field>
 
         <!-- Configuraciones adicionales -->
         <div class="checkbox-section">
           <mat-checkbox formControlName="isPublic">
-            Hacer pública
+            {{ 'publication.makePublic' | translate }}
           </mat-checkbox>
           <p class="checkbox-hint">
-            Las publicaciones públicas son visibles para todos los miembros de la comunidad
+            {{ 'publication.publicHint' | translate }}
           </p>
         </div>
 
@@ -137,21 +137,21 @@
         <div class="date-time-row">
           <!-- Fecha programada -->
           <mat-form-field appearance="fill" class="half-width">
-            <mat-label>Fecha programada *</mat-label>
+            <mat-label>{{ 'publication.scheduledDate' | translate }}</mat-label>
             <input matInput [matDatepicker]="picker" formControlName="scheduledDate" [required]="true">
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
             <mat-error *ngIf="publicationForm.get('scheduledDate')?.hasError('required')">
-              La fecha es requerida
+              {{ 'publication.dateRequired' | translate }}
             </mat-error>
           </mat-form-field>
 
           <!-- Hora -->
           <mat-form-field appearance="fill" class="half-width">
-            <mat-label>Hora *</mat-label>
+            <mat-label>{{ 'publication.time' | translate }}</mat-label>
             <input matInput type="time" formControlName="time">
             <mat-error *ngIf="publicationForm.get('time')?.hasError('required')">
-              La hora es requerida
+              {{ 'publication.timeRequired' | translate }}
             </mat-error>
           </mat-form-field>
         </div>
@@ -160,22 +160,22 @@
         <div class="date-time-row">
           <!-- Lugar -->
           <mat-form-field appearance="fill" class="half-width">
-            <mat-label>Lugar *</mat-label>
+            <mat-label>{{ 'publication.location' | translate }}</mat-label>
             <input matInput formControlName="location">
             <mat-error *ngIf="publicationForm.get('location')?.hasError('required')">
-              El lugar es requerido
+              {{ 'publication.locationRequired' | translate }}
             </mat-error>
           </mat-form-field>
 
           <!-- Cantidad máxima de voluntarios -->
           <mat-form-field appearance="fill" class="half-width">
-            <mat-label>Cantidad máxima de voluntarios *</mat-label>
+            <mat-label>{{ 'publication.maxVolunteers' | translate }}</mat-label>
             <input matInput type="number" formControlName="maxVolunteers" min="1">
             <mat-error *ngIf="publicationForm.get('maxVolunteers')?.hasError('required')">
-              La cantidad máxima de voluntarios es requerida
+              {{ 'publication.maxVolunteersRequired' | translate }}
             </mat-error>
             <mat-error *ngIf="publicationForm.get('maxVolunteers')?.hasError('min')">
-              Debe ser al menos 1 voluntario
+              {{ 'publication.maxVolunteersMin' | translate }}
             </mat-error>
           </mat-form-field>
         </div>
@@ -185,7 +185,7 @@
     <mat-card-actions align="end">
       <button mat-button type="button" (click)="onCancel()" [disabled]="submitting">
         <mat-icon>arrow_back</mat-icon>
-        Cancelar
+        {{ 'common.cancel' | translate }}
       </button>
       <button mat-raised-button color="primary" 
               type="button"
@@ -193,7 +193,7 @@
               (click)="onSubmit()">
         <mat-icon *ngIf="!submitting">{{ isEditMode ? 'save' : 'publish' }}</mat-icon>
         <mat-icon *ngIf="submitting" class="animate-spin">refresh</mat-icon>
-        {{ submitting ? (isEditMode ? 'Guardando...' : 'Creando...') : (isEditMode ? 'Guardar Cambios' : 'Crear Publicación') }}
+        {{ submitting ? (isEditMode ? ('publication.saving' | translate) : ('publication.creating' | translate)) : (isEditMode ? ('publication.saveChanges' | translate) : ('publication.createPublication' | translate)) }}
       </button>
     </mat-card-actions>
   </mat-card>

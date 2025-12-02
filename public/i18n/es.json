@@ -161,8 +161,30 @@
     "loadingOrganizations": "Cargando organizaciones...",
     "errorLoadingOrganizations": "Error al cargar organizaciones",
     "saving": "Guardando...",
+    "creating": "Creando...",
     "saved": "Publicación guardada exitosamente",
-    "errorSaving": "Error al guardar la publicación"
+    "errorSaving": "Error al guardar la publicación",
+    "selectImage": "Seleccionar imagen",
+    "imageFormats": "Formatos soportados: JPG, PNG, GIF (máx. 5MB)",
+    "organization": "Organización *",
+    "noOrganizationsAvailable": "No hay organizaciones disponibles",
+    "organizationRequired": "La organización es requerida",
+    "organizationLoadError": "No se pudieron cargar las organizaciones. Por favor recarga la página.",
+    "tags": "Tags",
+    "tagsHint": "Agrega etiquetas para que tu publicación sea más fácil de encontrar",
+    "makePublic": "Hacer pública",
+    "publicHint": "Las publicaciones públicas son visibles para todos los miembros de la comunidad",
+    "scheduledDate": "Fecha programada *",
+    "time": "Hora *",
+    "dateRequired": "La fecha es requerida",
+    "timeRequired": "La hora es requerida",
+    "location": "Lugar *",
+    "locationRequired": "El lugar es requerido",
+    "maxVolunteers": "Cantidad máxima de voluntarios *",
+    "maxVolunteersRequired": "La cantidad máxima de voluntarios es requerida",
+    "maxVolunteersMin": "Debe ser al menos 1 voluntario",
+    "saveChanges": "Guardar Cambios",
+    "createPublication": "Crear Publicación"
   },
   "messages": {
     "title": "Mensajes",
@@ -198,7 +220,14 @@
     "confirmDelete": "¿Estás seguro de que quieres eliminar este mensaje?",
     "messageDeleted": "Mensaje eliminado exitosamente",
     "errorDeleting": "Error al eliminar el mensaje",
-    "new": "Nuevo"
+    "new": "Nuevo",
+    "types": {
+      "inquiry": "Consulta",
+      "details": "Detalles",
+      "confirmation": "Confirmación",
+      "thankYou": "Agradecimiento",
+      "general": "General"
+    }
   },
   "notifications": {
     "title": "Notificaciones",
@@ -262,6 +291,52 @@
       "q6": "¿Cómo se organiza la sección de Comunidad y qué puedo hacer allí?"
     }
   },
+  "organization": {
+    "loading": "Cargando organización...",
+    "errorLoading": "Error al cargar la organización",
+    "backToCommunity": "Volver a Comunidad",
+    "back": "Volver",
+    "reload": "Recargar",
+    "reloadTooltip": "Recargar información",
+    "verified": "Organización verificada",
+    "volunteers": "voluntarios",
+    "foundedIn": "Fundada en",
+    "about": "Sobre la organización",
+    "categories": "Categorías",
+    "publications": "Publicaciones",
+    "noPublications": "Esta organización aún no tiene publicaciones.",
+    "contactInfo": "Información de contacto",
+    "statistics": "Estadísticas",
+    "yearsActive": "AÑOS ACTIVA",
+    "dateNotAvailable": "Fecha no disponible",
+    "locationNotAvailable": "Lugar no disponible",
+    "socialMedia": "Redes sociales",
+    "website": "Sitio web"
+  },
+  "sendMessage": {
+    "title": "Enviar Mensaje a Voluntarios",
+    "loadingVolunteers": "Cargando voluntarios...",
+    "subject": "Asunto *",
+    "message": "Mensaje *",
+    "url": "URL (opcional)",
+    "urlHint": "Agrega un enlace relacionado con el mensaje",
+    "selectVolunteers": "Seleccionar Voluntarios",
+    "selectAll": "Seleccionar todos",
+    "deselectAll": "Deseleccionar todos",
+    "noVolunteerSelected": "Ningún voluntario seleccionado",
+    "volunteersSelected": "voluntario seleccionado",
+    "volunteersSelectedPlural": "volunteers seleccionados",
+    "noVolunteersAvailable": "No hay voluntarios disponibles",
+    "cancel": "Cancelar",
+    "send": "Enviar",
+    "sending": "Enviando...",
+    "sendTo": "Enviar a",
+    "subjectRequired": "El asunto es requerido",
+    "subjectMinLength": "El asunto debe tener al menos 5 caracteres",
+    "messageRequired": "El mensaje es requerido",
+    "messageMinLength": "El mensaje debe tener al menos 10 caracteres",
+    "urlInvalid": "Por favor ingresa una URL válida (debe comenzar con http:// o https://)"
+  },
   "common": {
     "loading": "Cargando...",
     "error": "Error",
@@ -275,6 +350,8 @@
     "alreadyRegistered": "Ya estás registrado en esta actividad",
     "registeredSuccessfully": "Te has registrado exitosamente en la actividad",
     "errorRegistering": "Error al registrarse en la actividad",
-    "errorLoadingActivities": "Error al cargar las actividades"
+    "errorLoadingActivities": "Error al cargar las actividades",
+    "selected": "seleccionado",
+    "selectedPlural": "seleccionados"
   }
 }

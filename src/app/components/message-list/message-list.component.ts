@@ -1,11 +1,12 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Message } from '../../communication/domain/model/message';
 
 @Component({
   selector: 'app-message-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './message-list.component.html',
   styleUrl: './message-list.component.css'
 })

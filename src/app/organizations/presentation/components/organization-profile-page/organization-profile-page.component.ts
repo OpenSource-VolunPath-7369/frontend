@@ -6,11 +6,12 @@ import { OrganizationService } from '../../../application/services/organization.
 import { PublicationService } from '../../../../publications/application/services/publication.service';
 import { Organization } from '../../../domain/model/organization';
 import { Publication } from '../../../../publications/domain/model/publication';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-organization-profile-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './organization-profile-page.component.html',
   styleUrls: ['./organization-profile-page.component.css']
 })

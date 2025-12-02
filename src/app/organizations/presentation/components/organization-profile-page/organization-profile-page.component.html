@@ -3,7 +3,7 @@
   <div *ngIf="loading" class="flex justify-center items-center py-12">
     <div class="text-center">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-      <p class="mt-4 text-gray-600">Cargando organización...</p>
+      <p class="mt-4 text-gray-600">{{ 'organization.loading' | translate }}</p>
     </div>
   </div>
 
@@ -14,12 +14,12 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" />
       </svg>
     </div>
-    <h3 class="text-lg font-medium text-gray-900 mb-2">Error al cargar la organización</h3>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">{{ 'organization.errorLoading' | translate }}</h3>
     <p class="text-gray-600 mb-4">{{ error }}</p>
     <button 
       (click)="goBack()" 
       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-      Volver a Comunidad
+      {{ 'organization.backToCommunity' | translate }}
     </button>
   </div>
 
@@ -30,11 +30,11 @@
       <div class="header-actions">
         <button (click)="goBack()" class="back-button">
           <i class="fa-solid fa-arrow-left"></i>
-          Volver
+          {{ 'organization.back' | translate }}
         </button>
-        <button (click)="refreshOrganization()" class="refresh-button" title="Recargar información">
+        <button (click)="refreshOrganization()" class="refresh-button" [title]="'organization.reloadTooltip' | translate">
           <i class="fa-solid fa-rotate"></i>
-          Recargar
+          {{ 'organization.reload' | translate }}
         </button>
       </div>
       
@@ -44,7 +44,7 @@
                [alt]="organization.name" 
                class="logo-image"
                (error)="onImageError($event)">
-          <span *ngIf="organization.isVerified" class="verified-badge" title="Organización verificada">
+          <span *ngIf="organization.isVerified" class="verified-badge" [title]="'organization.verified' | translate">
             <i class="fa-solid fa-check-circle"></i>
           </span>
         </div>
@@ -57,10 +57,10 @@
             </span>
             <span class="volunteer-count">
               <i class="fa-solid fa-users"></i>
-              {{ organization.volunteerCount }} voluntarios
+              {{ organization.volunteerCount }} {{ 'organization.volunteers' | translate }}
             </span>
             <span *ngIf="organization.foundedYear" class="founded-year">
-              Fundada en {{ organization.foundedYear }}
+              {{ 'organization.foundedIn' | translate }} {{ organization.foundedYear }}
             </span>
           </div>
         </div>
@@ -73,13 +73,13 @@
       <div class="profile-main">
         <!-- Description -->
         <div class="info-card">
-          <h2 class="card-title">Sobre la organización</h2>
+          <h2 class="card-title">{{ 'organization.about' | translate }}</h2>
           <p class="description-text">{{ organization.description }}</p>
         </div>
 
         <!-- Categories -->
         <div *ngIf="organization.categories && organization.categories.length > 0" class="info-card">
-          <h2 class="card-title">Categorías</h2>
+          <h2 class="card-title">{{ 'organization.categories' | translate }}</h2>
           <div class="categories-list">
             <span *ngFor="let category of organization.categories" class="category-tag">
               {{ category }}
@@ -89,9 +89,9 @@
 
         <!-- Publications -->
         <div class="info-card">
-          <h2 class="card-title">Publicaciones ({{ publications.length }})</h2>
+          <h2 class="card-title">{{ 'organization.publications' | translate }} ({{ publications.length }})</h2>
           <div *ngIf="publications.length === 0" class="empty-state">
-            <p class="text-gray-500">Esta organización aún no tiene publicaciones.</p>
+            <p class="text-gray-500">{{ 'organization.noPublications' | translate }}</p>
           </div>
           <div *ngIf="publications.length > 0" class="publications-list">
             <div *ngFor="let publication of publications" class="publication-item">
@@ -114,7 +114,7 @@
       <div class="profile-sidebar">
         <!-- Contact Information -->
         <div class="info-card">
-          <h2 class="card-title">Información de contacto</h2>
+          <h2 class="card-title">{{ 'organization.contactInfo' | translate }}</h2>
           <div class="contact-info">
             <div *ngIf="organization.email" class="contact-item">
               <i class="fa-solid fa-envelope"></i>
@@ -130,14 +130,14 @@
             </div>
             <div *ngIf="organization.website" class="contact-item">
               <i class="fa-solid fa-globe"></i>
-              <a [href]="organization.website" target="_blank" rel="noopener noreferrer">Sitio web</a>
+              <a [href]="organization.website" target="_blank" rel="noopener noreferrer">{{ 'organization.website' | translate }}</a>
             </div>
           </div>
         </div>
 
         <!-- Social Media -->
         <div *ngIf="organization.hasSocialMedia()" class="info-card">
-          <h2 class="card-title">Redes sociales</h2>
+          <h2 class="card-title">{{ 'organization.socialMedia' | translate }}</h2>
           <div class="social-media">
             <a *ngIf="organization.socialMedia.facebook" 
                [href]="organization.socialMedia.facebook" 
@@ -168,19 +168,19 @@
 
         <!-- Stats -->
         <div class="info-card">
-          <h2 class="card-title">Estadísticas</h2>
+          <h2 class="card-title">{{ 'organization.statistics' | translate }}</h2>
           <div class="stats-grid">
             <div class="stat-item">
               <div class="stat-value">{{ organization.volunteerCount }}</div>
-              <div class="stat-label">Voluntarios</div>
+              <div class="stat-label">{{ 'organization.volunteers' | translate }}</div>
             </div>
             <div class="stat-item">
               <div class="stat-value">{{ publications.length }}</div>
-              <div class="stat-label">Publicaciones</div>
+              <div class="stat-label">{{ 'organization.publications' | translate }}</div>
             </div>
             <div *ngIf="organization.foundedYear" class="stat-item">
               <div class="stat-value">{{ organization.getAge() }}</div>
-              <div class="stat-label">Años activa</div>
+              <div class="stat-label">{{ 'organization.yearsActive' | translate }}</div>
             </div>
           </div>
         </div>

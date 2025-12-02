@@ -11,6 +11,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Subject, takeUntil } from 'rxjs';
 import { PublicationService } from '../../../application/services/publication.service';
 import { OrganizationService } from '../../../../organizations/application/services/organization.service';
@@ -38,7 +39,8 @@ import { Organization } from '../../../../organizations/domain/model/organizatio
     MatCardModule,
     MatIconModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    TranslatePipe
   ],
   templateUrl: './nueva-publicacion-page.component.html',
   styleUrls: ['./nueva-publicacion-page.component.css']

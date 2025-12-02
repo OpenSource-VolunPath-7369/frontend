@@ -62,9 +62,9 @@
       <mat-card-header>
         <div class="flex justify-between items-center w-full">
           <h2 class="text-lg font-semibold text-gray-900">
-            {{ isVolunteerMode ? 'Enviar Mensaje a Organizaciones' : 'Enviar Mensaje a Voluntarios' }}
+            {{ isVolunteerMode ? ('messages.sendToOrganizations' | translate) : ('sendMessage.title' | translate) }}
           </h2>
-          <button mat-icon-button (click)="toggleSendForm()" [title]="'Cerrar formulario'">
+          <button mat-icon-button (click)="toggleSendForm()" [title]="'common.close' | translate">
             <mat-icon>close</mat-icon>
           </button>
         </div>
@@ -84,37 +84,37 @@
         <form [formGroup]="messageForm" (ngSubmit)="sendMessageToRecipients()">
           <!-- Subject -->
           <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Asunto *</mat-label>
+            <mat-label>{{ 'sendMessage.subject' | translate }}</mat-label>
             <input matInput formControlName="subject">
             <mat-error *ngIf="messageForm.get('subject')?.hasError('required')">
-              El asunto es requerido
+              {{ 'sendMessage.subjectRequired' | translate }}
             </mat-error>
             <mat-error *ngIf="messageForm.get('subject')?.hasError('minlength')">
-              El asunto debe tener al menos 5 caracteres
+              {{ 'sendMessage.subjectMinLength' | translate }}
             </mat-error>
           </mat-form-field>
 
           <!-- Content -->
           <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Mensaje *</mat-label>
+            <mat-label>{{ 'sendMessage.message' | translate }}</mat-label>
             <textarea matInput formControlName="content" 
                       rows="3"></textarea>
             <mat-error *ngIf="messageForm.get('content')?.hasError('required')">
-              El mensaje es requerido
+              {{ 'sendMessage.messageRequired' | translate }}
             </mat-error>
             <mat-error *ngIf="messageForm.get('content')?.hasError('minlength')">
-              El mensaje debe tener al menos 10 caracteres
+              {{ 'sendMessage.messageMinLength' | translate }}
             </mat-error>
           </mat-form-field>
 
           <!-- URL -->
           <mat-form-field appearance="fill" class="full-width">
-            <mat-label>URL (opcional)</mat-label>
+            <mat-label>{{ 'sendMessage.url' | translate }}</mat-label>
             <input matInput formControlName="url" 
                    type="url">
-            <mat-hint>Agrega un enlace relacionado con el mensaje</mat-hint>
+            <mat-hint>{{ 'sendMessage.urlHint' | translate }}</mat-hint>
             <mat-error *ngIf="messageForm.get('url')?.hasError('pattern')">
-              Por favor ingresa una URL válida (debe comenzar con http:// o https://)
+              {{ 'sendMessage.urlInvalid' | translate }}
             </mat-error>
           </mat-form-field>
 
@@ -122,19 +122,19 @@
           <div class="volunteers-section">
             <div class="volunteers-header">
               <h3 class="section-title">
-                {{ isVolunteerMode ? 'Seleccionar Organizaciones' : 'Seleccionar Voluntarios' }}
+                {{ isVolunteerMode ? ('messages.selectRecipients' | translate) : ('sendMessage.selectVolunteers' | translate) }}
               </h3>
               <button type="button" mat-button (click)="selectAllRecipients()" class="select-all-button">
-                {{ allRecipientsSelected ? 'Deseleccionar todos' : 'Seleccionar todos' }}
+                {{ allRecipientsSelected ? ('sendMessage.deselectAll' | translate) : ('sendMessage.selectAll' | translate) }}
               </button>
             </div>
             
             <div class="selected-count">
               <span *ngIf="selectedCount > 0" class="count-badge">
-                {{ selectedCount }} {{ isVolunteerMode ? 'organización' : 'voluntario' }}{{ selectedCount > 1 ? (isVolunteerMode ? 'es' : 's') : '' }} seleccionada{{ selectedCount > 1 ? 's' : '' }}
+                {{ selectedCount }} {{ isVolunteerMode ? ('community.organizations' | translate) : ('sendMessage.volunteersSelected' | translate) }}{{ selectedCount > 1 ? (isVolunteerMode ? '' : 's') : '' }} {{ 'common.selected' | translate }}
               </span>
               <span *ngIf="selectedCount === 0" class="count-badge empty">
-                Ninguna {{ isVolunteerMode ? 'organización' : 'voluntario' }} seleccionada{{ isVolunteerMode ? '' : 'o' }}
+                {{ 'sendMessage.noVolunteerSelected' | translate }}
               </span>
             </div>
 
@@ -205,14 +205,14 @@
             </div>
 
             <div *ngIf="availableRecipients.length === 0" class="empty-volunteers">
-              <p class="text-gray-500">No hay {{ isVolunteerMode ? 'organizaciones' : 'voluntarios' }} disponibles</p>
+              <p class="text-gray-500">{{ isVolunteerMode ? ('community.organizations' | translate) : ('sendMessage.noVolunteersAvailable' | translate) }}</p>
             </div>
           </div>
 
           <!-- Action Buttons -->
           <div class="form-actions">
             <button mat-button type="button" (click)="toggleSendForm()" [disabled]="sending">
-              Cancelar
+              {{ 'common.cancel' | translate }}
             </button>
             <button mat-raised-button 
                     color="primary" 
@@ -220,7 +220,7 @@
                     [disabled]="sending || selectedCount === 0 || !messageForm.valid">
               <mat-icon *ngIf="!sending">send</mat-icon>
               <mat-icon *ngIf="sending" class="animate-spin">refresh</mat-icon>
-              {{ sending ? 'Enviando...' : `Enviar a ${selectedCount} voluntario${selectedCount !== 1 ? 's' : ''}` }}
+              {{ sending ? ('sendMessage.sending' | translate) : (('sendMessage.sendTo' | translate) + ' ' + selectedCount + ' ' + (isVolunteerMode ? ('community.organizations' | translate) : ('sendMessage.volunteersSelected' | translate))) }}
             </button>
           </div>
         </form>
@@ -240,8 +240,8 @@
           <!-- Header del mensaje -->
           <div class="message-view-header">
             <div class="flex items-center justify-between mb-4">
-              <h2 class="text-xl font-semibold text-gray-900">Mensaje</h2>
-              <button mat-icon-button (click)="closeMessageView()" [title]="'Cerrar'">
+              <h2 class="text-xl font-semibold text-gray-900">{{ 'messages.title' | translate }}</h2>
+              <button mat-icon-button (click)="closeMessageView()" [title]="'common.close' | translate">
                 <mat-icon>close</mat-icon>
               </button>
             </div>
@@ -271,15 +271,15 @@
           
           <!-- Formulario de respuesta -->
           <div class="reply-section-view">
-            <h4 class="reply-title-view">Responder</h4>
+            <h4 class="reply-title-view">{{ 'messages.reply' | translate }}</h4>
             <form [formGroup]="replyForm" (ngSubmit)="sendReply()">
               <mat-form-field appearance="fill" class="full-width">
-                <mat-label>Escribe tu respuesta...</mat-label>
+                <mat-label>{{ 'messages.contentPlaceholder' | translate }}</mat-label>
                 <textarea matInput 
                           formControlName="content" 
                           rows="4"></textarea>
                 <mat-error *ngIf="replyForm.get('content')?.hasError('required')">
-                  El mensaje es requerido
+                  {{ 'sendMessage.messageRequired' | translate }}
                 </mat-error>
               </mat-form-field>
               
@@ -288,16 +288,16 @@
                         type="button" 
                         (click)="closeMessageView()"
                         [disabled]="sendingReply">
-                  Cancelar
+                  {{ 'common.cancel' | translate }}
                 </button>
                 <button mat-raised-button 
                         color="primary" 
                         type="submit"
                         [disabled]="replyForm.invalid || sendingReply">
-                  <span *ngIf="!sendingReply">Enviar Respuesta</span>
+                  <span *ngIf="!sendingReply">{{ 'messages.reply' | translate }}</span>
                   <span *ngIf="sendingReply">
                     <mat-icon class="animate-spin">refresh</mat-icon>
-                    Enviando...
+                    {{ 'messages.sending' | translate }}
                   </span>
                 </button>
               </div>

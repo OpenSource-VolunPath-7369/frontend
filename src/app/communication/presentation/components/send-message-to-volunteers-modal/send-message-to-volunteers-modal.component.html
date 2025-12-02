@@ -1,6 +1,6 @@
 <div class="modal-container">
   <div class="modal-header">
-    <h2 class="modal-title">Enviar Mensaje a Voluntarios</h2>
+    <h2 class="modal-title">{{ 'sendMessage.title' | translate }}</h2>
     <button mat-icon-button (click)="onCancel()" class="close-button">
       <mat-icon>close</mat-icon>
     </button>
@@ -11,7 +11,7 @@
     <div *ngIf="loading" class="flex justify-center items-center py-12">
       <div class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p class="mt-4 text-gray-600">Cargando voluntarios...</p>
+        <p class="mt-4 text-gray-600">{{ 'sendMessage.loadingVolunteers' | translate }}</p>
       </div>
     </div>
 
@@ -30,55 +30,55 @@
       <form [formGroup]="messageForm" (ngSubmit)="onSubmit()">
         <!-- Subject -->
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Asunto *</mat-label>
+          <mat-label>{{ 'sendMessage.subject' | translate }}</mat-label>
           <input matInput formControlName="subject">
           <mat-error *ngIf="messageForm.get('subject')?.hasError('required')">
-            El asunto es requerido
+            {{ 'sendMessage.subjectRequired' | translate }}
           </mat-error>
           <mat-error *ngIf="messageForm.get('subject')?.hasError('minlength')">
-            El asunto debe tener al menos 5 caracteres
+            {{ 'sendMessage.subjectMinLength' | translate }}
           </mat-error>
         </mat-form-field>
 
         <!-- Content -->
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Mensaje *</mat-label>
+          <mat-label>{{ 'sendMessage.message' | translate }}</mat-label>
           <textarea matInput formControlName="content" 
                     rows="6"></textarea>
           <mat-error *ngIf="messageForm.get('content')?.hasError('required')">
-            El mensaje es requerido
+            {{ 'sendMessage.messageRequired' | translate }}
           </mat-error>
           <mat-error *ngIf="messageForm.get('content')?.hasError('minlength')">
-            El mensaje debe tener al menos 10 caracteres
+            {{ 'sendMessage.messageMinLength' | translate }}
           </mat-error>
         </mat-form-field>
 
         <!-- URL -->
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>URL (opcional)</mat-label>
+          <mat-label>{{ 'sendMessage.url' | translate }}</mat-label>
           <input matInput formControlName="url" 
                  type="url">
-          <mat-hint>Agrega un enlace relacionado con el mensaje</mat-hint>
+          <mat-hint>{{ 'sendMessage.urlHint' | translate }}</mat-hint>
           <mat-error *ngIf="messageForm.get('url')?.hasError('pattern')">
-            Por favor ingresa una URL válida (debe comenzar con http:// o https://)
+            {{ 'sendMessage.urlInvalid' | translate }}
           </mat-error>
         </mat-form-field>
 
         <!-- Volunteers Selection -->
         <div class="volunteers-section">
           <div class="volunteers-header">
-            <h3 class="section-title">Seleccionar Voluntarios</h3>
+            <h3 class="section-title">{{ 'sendMessage.selectVolunteers' | translate }}</h3>
             <button type="button" mat-button (click)="selectAll()" class="select-all-button">
-              {{ allSelected ? 'Deseleccionar todos' : 'Seleccionar todos' }}
+              {{ allSelected ? ('sendMessage.deselectAll' | translate) : ('sendMessage.selectAll' | translate) }}
             </button>
           </div>
           
           <div class="selected-count">
             <span *ngIf="selectedCount > 0" class="count-badge">
-              {{ selectedCount }} voluntario{{ selectedCount > 1 ? 's' : '' }} seleccionado{{ selectedCount > 1 ? 's' : '' }}
+              {{ selectedCount }} {{ selectedCount > 1 ? ('sendMessage.volunteersSelectedPlural' | translate) : ('sendMessage.volunteersSelected' | translate) }}
             </span>
             <span *ngIf="selectedCount === 0" class="count-badge empty">
-              Ningún voluntario seleccionado
+              {{ 'sendMessage.noVolunteerSelected' | translate }}
             </span>
           </div>
 
@@ -115,7 +115,7 @@
           </div>
 
           <div *ngIf="volunteers.length === 0" class="empty-volunteers">
-            <p class="text-gray-500">No hay voluntarios disponibles</p>
+            <p class="text-gray-500">{{ 'sendMessage.noVolunteersAvailable' | translate }}</p>
           </div>
         </div>
       </form>
@@ -124,7 +124,7 @@
 
   <div class="modal-actions">
     <button mat-button type="button" (click)="onCancel()" [disabled]="sending">
-      Cancelar
+      {{ 'sendMessage.cancel' | translate }}
     </button>
     <button mat-raised-button 
             color="primary" 
@@ -133,7 +133,7 @@
             (click)="onSubmit()">
       <mat-icon *ngIf="!sending">send</mat-icon>
       <mat-icon *ngIf="sending" class="animate-spin">refresh</mat-icon>
-      {{ sending ? 'Enviando...' : `Enviar a ${selectedCount} voluntario${selectedCount !== 1 ? 's' : ''}` }}
+      {{ sending ? ('sendMessage.sending' | translate) : (('sendMessage.sendTo' | translate) + ' ' + selectedCount + ' ' + (selectedCount !== 1 ? ('sendMessage.volunteersSelectedPlural' | translate) : ('sendMessage.volunteersSelected' | translate))) }}
     </button>
   </div>
 </div>

@@ -67,7 +67,7 @@
     </div>
     
     <div *ngIf="notifications.length === 0" class="empty-state">
-      <p>No hay notificaciones</p>
+      <p>{{ 'notifications.noNotifications' | translate }}</p>
     </div>
   </div>
 </div>
@@ -76,7 +76,7 @@
 <div *ngIf="showMessageModal" class="message-modal-overlay" (click)="closeMessageModal()">
   <div class="message-modal-content" (click)="$event.stopPropagation()">
     <div class="message-modal-header">
-      <h2 class="message-modal-title">Mensaje</h2>
+      <h2 class="message-modal-title">{{ 'messages.title' | translate }}</h2>
       <button class="message-modal-close" (click)="closeMessageModal()" type="button">
         <i class="fa-solid fa-times"></i>
       </button>
@@ -102,15 +102,15 @@
       
       <!-- Formulario de respuesta -->
       <div class="reply-section">
-        <h4 class="reply-title">Responder</h4>
+        <h4 class="reply-title">{{ 'messages.reply' | translate }}</h4>
         <form [formGroup]="replyForm" (ngSubmit)="sendReply()">
           <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Escribe tu respuesta...</mat-label>
+            <mat-label>{{ 'messages.contentPlaceholder' | translate }}</mat-label>
             <textarea matInput 
                       formControlName="content" 
                       rows="4"></textarea>
             <mat-error *ngIf="replyForm.get('content')?.hasError('required')">
-              El mensaje es requerido
+              {{ 'sendMessage.messageRequired' | translate }}
             </mat-error>
           </mat-form-field>
           
@@ -119,15 +119,15 @@
                     type="button" 
                     (click)="closeMessageModal()"
                     [disabled]="sendingReply">
-              Cancelar
+              {{ 'common.cancel' | translate }}
             </button>
             <button mat-raised-button 
                     color="primary" 
                     type="submit"
                     [disabled]="replyForm.invalid || sendingReply">
-              <span *ngIf="!sendingReply">Enviar Respuesta</span>
+              <span *ngIf="!sendingReply">{{ 'messages.reply' | translate }}</span>
               <span *ngIf="sendingReply">
-                <i class="fa-solid fa-spinner fa-spin"></i> Enviando...
+                <i class="fa-solid fa-spinner fa-spin"></i> {{ 'messages.sending' | translate }}
               </span>
             </button>
           </div>

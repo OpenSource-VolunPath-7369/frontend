@@ -162,10 +162,10 @@
               class="register-button"
               (click)="registerForPublication(publication)"
               [disabled]="isRegistered(publication.id)"
-              [title]="isRegistered(publication.id) ? 'Ya estás registrado' : 'Registrarse en esta actividad'">
+              [title]="isRegistered(publication.id) ? ('community.alreadyRegisteredTooltip' | translate) : ('community.registerTooltip' | translate)">
               <i class="fa-solid fa-user-plus"></i>
-              <span *ngIf="!isRegistered(publication.id)">Registrarse</span>
-              <span *ngIf="isRegistered(publication.id)">Ya registrado</span>
+              <span *ngIf="!isRegistered(publication.id)">{{ 'community.register' | translate }}</span>
+              <span *ngIf="isRegistered(publication.id)">{{ 'community.alreadyRegistered' | translate }}</span>
             </button>
           </div>
           
@@ -178,7 +178,7 @@
                 <i class="fa-solid fa-calendar"></i> 
                 <span *ngIf="publication.date">{{ publication.date }}</span>
                 <span *ngIf="!publication.date && !publication.time">Fecha no disponible</span>
-                <span *ngIf="publication.date && publication.time"> a las </span>
+                <span *ngIf="publication.date && publication.time"> {{ 'community.atTime' | translate }} </span>
                 <span *ngIf="publication.time">{{ publication.time }}</span>
               </span>
               <!-- Lugar -->
@@ -189,7 +189,7 @@
               </span>
               <!-- Voluntarios -->
               <span *ngIf="publication.maxVolunteers > 0">
-                <i class="fa-solid fa-users"></i> {{ publication.currentVolunteers }}/{{ publication.maxVolunteers }} voluntarios
+                <i class="fa-solid fa-users"></i> {{ publication.currentVolunteers }}/{{ publication.maxVolunteers }} {{ 'community.volunteers' | translate }}
               </span>
             </div>
             <div *ngIf="publication.tags && publication.tags.length > 0" class="tags">
@@ -203,7 +203,7 @@
     <!-- Organizations Section -->
     <div class="sidebar-section">
       <div class="organizations-card">
-        <h3 class="organizations-title">Organizaciones</h3>
+        <h3 class="organizations-title">{{ 'community.organizations' | translate }}</h3>
         
         <div class="organizations-list">
           <div 
