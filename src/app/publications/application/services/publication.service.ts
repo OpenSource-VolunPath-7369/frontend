@@ -162,8 +162,8 @@ export class PublicationService {
         scheduledDate = `${year}-${month}-${day}`;
       } else if (typeof publicationData.date === 'string' && publicationData.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
         scheduledDate = publicationData.date;
-      } else if (publicationData.date instanceof Date) {
-        scheduledDate = publicationData.date.toISOString().split('T')[0];
+      } else if (publicationData.date && typeof publicationData.date === 'object' && 'toISOString' in publicationData.date) {
+        scheduledDate = (publicationData.date as Date).toISOString().split('T')[0];
       } else {
         try {
           const dateObj = new Date(publicationData.date as any);
@@ -234,9 +234,9 @@ export class PublicationService {
       } else if (typeof publicationData.date === 'string' && publicationData.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
         // Ya está en formato YYYY-MM-DD
         scheduledDate = publicationData.date;
-      } else if (publicationData.date instanceof Date) {
+      } else if (publicationData.date && typeof publicationData.date === 'object' && 'toISOString' in publicationData.date) {
         // Si es un objeto Date, convertirlo a YYYY-MM-DD
-        scheduledDate = publicationData.date.toISOString().split('T')[0];
+        scheduledDate = (publicationData.date as Date).toISOString().split('T')[0];
       } else {
         // Intentar parsear como string
         try {
