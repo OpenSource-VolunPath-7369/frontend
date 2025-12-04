@@ -115,6 +115,10 @@ export default class DashboardPageComponent implements OnInit, OnDestroy {
             // Load enrollments for each publication
             publications.forEach(pub => {
               this.loadEnrollmentsForPublication(pub.id);
+              // Check registration status for current user
+              if (this.currentUser) {
+                this.checkRegistrationStatus(pub.id);
+              }
             });
           },
           error: (error) => {
@@ -134,6 +138,10 @@ export default class DashboardPageComponent implements OnInit, OnDestroy {
             // Load enrollments for each publication
             publications.forEach(pub => {
               this.loadEnrollmentsForPublication(pub.id);
+              // Check registration status for current user
+              if (this.currentUser) {
+                this.checkRegistrationStatus(pub.id);
+              }
             });
           },
           error: (error) => {
@@ -191,8 +199,8 @@ export default class DashboardPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Check if already registered
-    if (this.enrollmentService.isVolunteerRegistered(publication.id, this.currentUser.id)) {
+    // Check if already registered (synchronous check from local state)
+    if (this.isRegistered(publication.id)) {
       alert('Ya estás registrado en este voluntariado');
       return;
     }
@@ -213,26 +221,16 @@ export default class DashboardPageComponent implements OnInit, OnDestroy {
           console.log('Registro exitoso:', result);
           console.log('Enrollment creado:', result.enrollment);
           
-          // Immediately add the enrollment to the local list
-          if (result.enrollment) {
-            const currentEnrollments = this.publicationEnrollments[publication.id] || [];
-            this.publicationEnrollments = {
-              ...this.publicationEnrollments,
-              [publication.id]: [...currentEnrollments, result.enrollment]
-            };
-            console.log('Enrollments actualizados localmente:', this.publicationEnrollments[publication.id]);
-          }
-          
-          // Reload enrollments from storage to ensure consistency
+          // Reload enrollments from backend
           this.loadEnrollmentsForPublication(publication.id);
           
           // Reload publications to get updated counter from backend
-          // Wait a bit to ensure backend has processed the update
+          // The backend automatically updates the counter when creating enrollment
           setTimeout(() => {
             this.publicationService.refreshPublications();
             setTimeout(() => {
               this.loadPublications();
-            }, 200);
+            }, 300);
           }, 500);
           
           alert('Registrado exitosamente');
@@ -269,7 +267,26 @@ export default class DashboardPageComponent implements OnInit, OnDestroy {
 
   isRegistered(publicationId: string): boolean {
     if (!this.currentUser) return false;
-    return this.enrollmentService.isVolunteerRegistered(publicationId, this.currentUser.id);
+    // Check synchronously from local state first
+    const enrollments = this.publicationEnrollments[publicationId] || [];
+    return enrollments.some(e => String(e.volunteerId) === this.currentUser?.id);
+  }
+
+  checkRegistrationStatus(publicationId: string) {
+    if (!this.currentUser) return;
+    this.enrollmentService.isVolunteerRegistered(publicationId, this.currentUser.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (isRegistered) => {
+          // Update local state if needed
+          if (isRegistered) {
+            this.loadEnrollmentsForPublication(publicationId);
+          }
+        },
+        error: (error) => {
+          console.error('Error checking registration status:', error);
+        }
+      });
   }
 
   trackByPublicationId(index: number, publication: Publication): string {

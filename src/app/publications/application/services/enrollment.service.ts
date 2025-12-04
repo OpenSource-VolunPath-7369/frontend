@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { switchMap, tap, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { ApiService } from '../../../shared/infrastructure/api.service';
 import { PublicationService } from './publication.service';
-import { Publication } from '../../domain/model/publication';
 
 export interface Enrollment {
-  id: string;
-  publicationId: string;
-  volunteerId: string;
+  id: number;
+  publicationId: number;
+  volunteerId: number;
   volunteerName: string;
-  registeredAt: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 /**
@@ -29,56 +30,28 @@ export class EnrollmentService {
    * Register a volunteer for a publication
    */
   registerVolunteer(publicationId: string, volunteerId: string, volunteerName: string): Observable<any> {
-    // First, get the current publication to check available spots
-    return this.publicationService.getPublicationById(publicationId).pipe(
-      switchMap(publication => {
-        // Check if volunteer is already registered
-        const enrollments = this.getStoredEnrollments();
-        const existingEnrollment = enrollments.find(
-          e => e.publicationId === publicationId && e.volunteerId === volunteerId
-        );
-        
-        if (existingEnrollment) {
-          throw new Error('Ya estás registrado en este voluntariado');
-        }
-        
-        if (publication.currentVolunteers >= publication.maxVolunteers) {
-          throw new Error('No hay cupos disponibles');
-        }
-        
-        // Create enrollment
-        const enrollment: Enrollment = {
-          id: Date.now().toString(),
-          publicationId: publicationId,
-          volunteerId: volunteerId,
-          volunteerName: volunteerName,
-          registeredAt: new Date().toISOString()
-        };
-        
-        // Store enrollment
-        this.storeEnrollment(enrollment);
-        
-        // Update the publication to increment currentVolunteers
-        const updatedData = {
-          currentVolunteers: publication.currentVolunteers + 1
-        };
-        
-        return this.publicationService.updatePublication(publicationId, updatedData).pipe(
-          tap((updatedPublication) => {
-            console.log('Contador de voluntarios actualizado:', updatedPublication);
-            console.log('Nuevo contador:', updatedPublication.currentVolunteers);
-            // Refresh publications list to ensure UI is updated
-            setTimeout(() => {
-              this.publicationService.refreshPublications();
-            }, 200);
-          }),
-          map(() => ({
-            success: true,
-            message: 'Registrado exitosamente',
-            enrollment: enrollment
-          }))
-        );
-      })
+    const enrollmentData = {
+      publicationId: Number(publicationId),
+      volunteerId: Number(volunteerId),
+      volunteerName: volunteerName
+    };
+
+    return this.apiService.post<Enrollment>(
+      `publications/${publicationId}/enrollments`,
+      enrollmentData
+    ).pipe(
+      tap((enrollment) => {
+        console.log('Enrollment creado en backend:', enrollment);
+        // Refresh publications to get updated counter
+        setTimeout(() => {
+          this.publicationService.refreshPublications();
+        }, 300);
+      }),
+      map((enrollment) => ({
+        success: true,
+        message: 'Registrado exitosamente',
+        enrollment: this.mapToFrontendEnrollment(enrollment)
+      }))
     );
   }
 
@@ -86,36 +59,33 @@ export class EnrollmentService {
    * Get enrollments for a publication
    */
   getEnrollmentsByPublication(publicationId: string): Observable<Enrollment[]> {
-    const enrollments = this.getStoredEnrollments();
-    const publicationEnrollments = enrollments.filter(e => e.publicationId === publicationId);
-    return of(publicationEnrollments);
+    return this.apiService.get<Enrollment[]>(`publications/${publicationId}/enrollments`).pipe(
+      map(enrollments => enrollments.map(e => this.mapToFrontendEnrollment(e)))
+    );
   }
 
   /**
    * Check if a volunteer is registered for a publication
    */
-  isVolunteerRegistered(publicationId: string, volunteerId: string): boolean {
-    const enrollments = this.getStoredEnrollments();
-    return enrollments.some(
-      e => e.publicationId === publicationId && e.volunteerId === volunteerId
+  isVolunteerRegistered(publicationId: string, volunteerId: string): Observable<boolean> {
+    return this.apiService.get<boolean>(
+      `publications/${publicationId}/enrollments/check?volunteerId=${volunteerId}`
     );
   }
 
   /**
-   * Store enrollment in localStorage (temporary solution)
+   * Map backend enrollment to frontend format
    */
-  private storeEnrollment(enrollment: Enrollment): void {
-    const enrollments = this.getStoredEnrollments();
-    enrollments.push(enrollment);
-    localStorage.setItem('enrollments', JSON.stringify(enrollments));
-  }
-
-  /**
-   * Get stored enrollments from localStorage
-   */
-  private getStoredEnrollments(): Enrollment[] {
-    const stored = localStorage.getItem('enrollments');
-    return stored ? JSON.parse(stored) : [];
+  private mapToFrontendEnrollment(backendEnrollment: any): Enrollment {
+    return {
+      id: backendEnrollment.id,
+      publicationId: backendEnrollment.publicationId,
+      volunteerId: backendEnrollment.volunteerId,
+      volunteerName: backendEnrollment.volunteerName,
+      status: backendEnrollment.status,
+      createdAt: backendEnrollment.createdAt,
+      updatedAt: backendEnrollment.updatedAt
+    };
   }
 }
 
