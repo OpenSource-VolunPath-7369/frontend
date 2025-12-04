@@ -323,16 +323,61 @@ export default class ComunidadPageComponent implements OnInit, OnDestroy {
         next: (result) => {
           console.log('Registro exitoso en comunidad:', result);
           
+          // Update local enrollment state immediately
+          const newEnrollment: Enrollment = {
+            id: result.enrollment.id,
+            publicationId: result.enrollment.publicationId,
+            volunteerId: result.enrollment.volunteerId,
+            volunteerName: result.enrollment.volunteerName,
+            status: result.enrollment.status,
+            createdAt: result.enrollment.createdAt,
+            updatedAt: result.enrollment.updatedAt
+          };
+          this.publicationEnrollments[publication.id] = [
+            ...(this.publicationEnrollments[publication.id] || []),
+            newEnrollment
+          ];
+          
+          // Update local publication counter immediately for instant feedback
+          const currentPublications = this.publications || [];
+          const updatedPublications = currentPublications.map(p => {
+            if (p.id === publication.id) {
+              return new Publication(
+                p.id,
+                p.title,
+                p.description,
+                p.image,
+                p.organizationId,
+                p.likes,
+                p.date,
+                p.time,
+                p.location,
+                p.maxVolunteers,
+                p.currentVolunteers + 1, // Increment counter
+                p.status,
+                p.tags,
+                p.createdAt,
+                p.updatedAt
+              );
+            }
+            return p;
+          });
+          this.publications = updatedPublications;
+          
           // Reload enrollments from backend
           this.loadEnrollmentsForPublication(publication.id);
           
           // Update local registration state
           this.userRegistrations.set(publication.id, 'confirmed');
           
-          // Reload publications to get updated counter
+          // Reload publications from backend to ensure sync (with longer delay)
           setTimeout(() => {
             this.publicationService.refreshPublications();
-          }, 500);
+            // Reload data to get updated publications
+            setTimeout(() => {
+              this.loadData();
+            }, 500);
+          }, 1500);
     
     // Mostrar mensaje de éxito
     this.successMessage = '¡Registrado exitosamente!';

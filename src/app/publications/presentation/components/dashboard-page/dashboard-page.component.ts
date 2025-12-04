@@ -264,17 +264,59 @@ export default class DashboardPageComponent implements OnInit, OnDestroy {
           console.log('Registro exitoso:', result);
           console.log('Enrollment creado:', result.enrollment);
           
-          // Reload enrollments from backend immediately
+          // Update local state immediately for better UX
+          const newEnrollment: Enrollment = {
+            id: result.enrollment.id,
+            publicationId: result.enrollment.publicationId,
+            volunteerId: result.enrollment.volunteerId,
+            volunteerName: result.enrollment.volunteerName,
+            status: result.enrollment.status,
+            createdAt: result.enrollment.createdAt,
+            updatedAt: result.enrollment.updatedAt
+          };
+          this.publicationEnrollments[publication.id] = [
+            ...(this.publicationEnrollments[publication.id] || []),
+            newEnrollment
+          ];
+          
+          // Update local publication counter immediately for instant feedback
+          const currentPublications = this.publications || [];
+          const updatedPublications = currentPublications.map(p => {
+            if (p.id === publication.id) {
+              return new Publication(
+                p.id,
+                p.title,
+                p.description,
+                p.image,
+                p.organizationId,
+                p.likes,
+                p.date,
+                p.time,
+                p.location,
+                p.maxVolunteers,
+                p.currentVolunteers + 1, // Increment counter
+                p.status,
+                p.tags,
+                p.createdAt,
+                p.updatedAt
+              );
+            }
+            return p;
+          });
+          this.publications = updatedPublications;
+          
+          // Reload enrollments from backend
           this.loadEnrollmentsForPublication(publication.id);
           
-          // Reload publications to get updated counter from backend
-          // The backend automatically updates the counter when creating enrollment
+          // Reload publications from backend to ensure sync (with longer delay to ensure backend has updated)
+          // The backend updates the counter in a transaction, so we need to wait a bit
           setTimeout(() => {
             this.publicationService.refreshPublications();
+            // Also reload local publications after refresh
             setTimeout(() => {
               this.loadPublications();
-            }, 300);
-          }, 500);
+            }, 500);
+          }, 1500);
           
           alert('Registrado exitosamente');
         },
