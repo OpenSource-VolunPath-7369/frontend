@@ -115,7 +115,7 @@
 
         <!-- Volunteers List -->
         <div class="volunteers-list" *ngIf="getEnrollmentsForPublication(publication.id) && getEnrollmentsForPublication(publication.id).length > 0">
-          <h4 class="volunteers-list-title">Voluntarios registrados:</h4>
+          <h4 class="volunteers-list-title">{{ 'community.registeredVolunteers' | translate }}</h4>
           <div class="volunteers-avatars">
             <div 
               *ngFor="let enrollment of getEnrollmentsForPublication(publication.id); trackBy: trackByEnrollmentId"
