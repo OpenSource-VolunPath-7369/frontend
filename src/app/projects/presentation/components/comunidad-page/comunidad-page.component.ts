@@ -45,6 +45,9 @@ export default class ComunidadPageComponent implements OnInit, OnDestroy {
   // Enrollments por publicación
   publicationEnrollments: { [publicationId: string]: Enrollment[] } = {};
   
+  // Mapa de volunteerId -> avatar para mostrar fotos
+  volunteerAvatars: { [volunteerId: number]: string } = {};
+  
   // Mensaje de éxito
   successMessage: string | null = null;
   showSuccessMessage = false;
@@ -330,16 +333,16 @@ export default class ComunidadPageComponent implements OnInit, OnDestroy {
           setTimeout(() => {
             this.publicationService.refreshPublications();
           }, 500);
-          
-          // Mostrar mensaje de éxito
-          this.successMessage = '¡Registrado exitosamente!';
-          this.showSuccessMessage = true;
-          
-          // Ocultar el mensaje después de 3 segundos
-          setTimeout(() => {
-            this.showSuccessMessage = false;
-            this.successMessage = null;
-          }, 3000);
+    
+    // Mostrar mensaje de éxito
+    this.successMessage = '¡Registrado exitosamente!';
+    this.showSuccessMessage = true;
+    
+    // Ocultar el mensaje después de 3 segundos
+    setTimeout(() => {
+      this.showSuccessMessage = false;
+      this.successMessage = null;
+    }, 3000);
         },
         error: (error: any) => {
           console.error('Error registering in community:', error);
@@ -359,11 +362,40 @@ export default class ComunidadPageComponent implements OnInit, OnDestroy {
             ...this.publicationEnrollments,
             [publicationId]: enrollments
           };
+          
+          // Load avatars for volunteers
+          enrollments.forEach(enrollment => {
+            this.loadVolunteerAvatar(enrollment.volunteerId);
+          });
         },
         error: (error) => {
           console.error('Error loading enrollments in community:', error);
         }
       });
+  }
+
+  loadVolunteerAvatar(volunteerId: number) {
+    // Skip if already loaded
+    if (this.volunteerAvatars[volunteerId]) {
+      return;
+    }
+    
+    this.volunteerService.getVolunteerById(String(volunteerId))
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (volunteer) => {
+          if (volunteer.avatar) {
+            this.volunteerAvatars[volunteerId] = volunteer.avatar;
+          }
+        },
+        error: (error) => {
+          console.error('Error loading volunteer avatar:', error);
+        }
+      });
+  }
+
+  getVolunteerAvatar(volunteerId: number): string {
+    return this.volunteerAvatars[volunteerId] || '/assets/default-avatar.png';
   }
 
   checkRegistrationStatus(publicationId: string) {

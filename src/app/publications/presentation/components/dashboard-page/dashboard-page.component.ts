@@ -32,6 +32,7 @@ export default class DashboardPageComponent implements OnInit, OnDestroy {
   error: string | null = null;
   currentUser: User | null = null;
   publicationEnrollments: { [publicationId: string]: Enrollment[] } = {};
+  volunteerAvatars: { [volunteerId: number]: string } = {};
   
   private destroy$ = new Subject<void>();
 
@@ -298,12 +299,41 @@ export default class DashboardPageComponent implements OnInit, OnDestroy {
             [publicationId]: enrollments
           };
           console.log('Enrollments actualizados en componente:', this.publicationEnrollments[publicationId]);
+          
+          // Load avatars for volunteers
+          enrollments.forEach(enrollment => {
+            this.loadVolunteerAvatar(enrollment.volunteerId);
+          });
         },
         error: (error) => {
           console.error('Error loading enrollments:', error);
           console.error('Error completo:', JSON.stringify(error, null, 2));
         }
       });
+  }
+
+  loadVolunteerAvatar(volunteerId: number) {
+    // Skip if already loaded
+    if (this.volunteerAvatars[volunteerId]) {
+      return;
+    }
+    
+    this.volunteerService.getVolunteerById(String(volunteerId))
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (volunteer) => {
+          if (volunteer.avatar) {
+            this.volunteerAvatars[volunteerId] = volunteer.avatar;
+          }
+        },
+        error: (error) => {
+          console.error('Error loading volunteer avatar:', error);
+        }
+      });
+  }
+
+  getVolunteerAvatar(volunteerId: number): string {
+    return this.volunteerAvatars[volunteerId] || '/assets/default-avatar.png';
   }
 
   getEnrollmentsForPublication(publicationId: string): Enrollment[] {

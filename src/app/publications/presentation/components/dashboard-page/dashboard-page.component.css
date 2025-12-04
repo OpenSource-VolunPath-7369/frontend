@@ -487,31 +487,77 @@
   margin: 0 0 12px 0;
 }
 
-.volunteers-names {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.volunteers-avatars {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 8px;
-}
-
-.volunteers-names li {
-  padding: 8px 12px;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid rgba(229, 231, 235, 0.5);
-  color: #4b5563;
-  font-size: 0.9rem;
-  font-weight: 500;
-  display: flex;
   align-items: center;
-  gap: 8px;
 }
 
-.volunteers-names li::before {
-  content: '👤';
-  font-size: 1rem;
+.volunteer-avatar-container {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.volunteer-avatar-container:hover {
+  transform: scale(1.15);
+  z-index: 10;
+}
+
+.volunteer-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(14, 165, 233, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.volunteer-avatar-container:hover .volunteer-avatar {
+  border-color: rgba(14, 165, 233, 0.6);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+/* Tooltip */
+.volunteer-avatar-container::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background: rgba(31, 41, 55, 0.95);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.volunteer-avatar-container::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-2px);
+  border: 5px solid transparent;
+  border-top-color: rgba(31, 41, 55, 0.95);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1001;
+}
+
+.volunteer-avatar-container:hover::after,
+.volunteer-avatar-container:hover::before {
+  opacity: 1;
 }
 
 /* Responsive design */

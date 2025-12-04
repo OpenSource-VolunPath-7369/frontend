@@ -116,11 +116,18 @@
         <!-- Volunteers List -->
         <div class="volunteers-list" *ngIf="getEnrollmentsForPublication(publication.id) && getEnrollmentsForPublication(publication.id).length > 0">
           <h4 class="volunteers-list-title">Voluntarios registrados:</h4>
-          <ul class="volunteers-names">
-            <li *ngFor="let enrollment of getEnrollmentsForPublication(publication.id); trackBy: trackByEnrollmentId">
-              {{ enrollment.volunteerName }}
-            </li>
-          </ul>
+          <div class="volunteers-avatars">
+            <div 
+              *ngFor="let enrollment of getEnrollmentsForPublication(publication.id); trackBy: trackByEnrollmentId"
+              class="volunteer-avatar-container"
+              [title]="enrollment.volunteerName">
+              <img 
+                [src]="getVolunteerAvatar(enrollment.volunteerId)" 
+                [alt]="enrollment.volunteerName"
+                class="volunteer-avatar"
+                (error)="$event.target.src='/assets/default-avatar.png'">
+            </div>
+          </div>
         </div>
 
         <div *ngIf="publication.tags && publication.tags.length > 0" class="tags">
