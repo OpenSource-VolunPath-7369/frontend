@@ -263,7 +263,8 @@ export default class DashboardPageComponent implements OnInit, OnDestroy {
   }
 
   getEnrollmentsForPublication(publicationId: string): Enrollment[] {
-    return this.publicationEnrollments[publicationId] || [];
+    const enrollments = this.publicationEnrollments[publicationId];
+    return enrollments ? enrollments : [];
   }
 
   isRegistered(publicationId: string): boolean {
